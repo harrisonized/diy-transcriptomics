@@ -1,0 +1,20 @@
+[2023-01-25 15:03:48,659] multiqc                                            [DEBUG  ]  This is MultiQC v1.14
+[2023-01-25 15:03:48,659] multiqc                                            [DEBUG  ]  Command used: /home/harrisonized/anaconda3/envs/rnaseq/bin/multiqc -d data
+[2023-01-25 15:03:49,176] multiqc                                            [DEBUG  ]  Latest MultiQC version is v1.14
+[2023-01-25 15:03:49,176] multiqc                                            [DEBUG  ]  Working dir : /home/harrisonized/github/diy-transcriptomics
+[2023-01-25 15:03:49,176] multiqc                                            [DEBUG  ]  Template    : default
+[2023-01-25 15:03:49,177] multiqc                                            [DEBUG  ]  Running Python 3.8.16 (default, Jan 17 2023, 23:13:24)  [GCC 11.2.0]
+[2023-01-25 15:03:49,177] multiqc                                            [INFO   ]  Prepending directory to sample names
+[2023-01-25 15:03:49,178] multiqc                                            [DEBUG  ]  Analysing modules: custom_content, ccs, ngsderive, purple, conpair, lima, peddy, somalier, methylQA, mosdepth, phantompeakqualtools, qualimap, preseq, hifiasm, quast, qorts, rna_seqc, rockhopper, rsem, rseqc, busco, bustools, goleft_indexcov, gffcompare, disambiguate, supernova, deeptools, sargasso, verifybamid, mirtrace, happy, mirtop, sambamba, gopeaks, homer, hops, macs2, theta2, snpeff, gatk, htseq, bcftools, featureCounts, fgbio, dragen, dragen_fastqc, dedup, pbmarkdup, damageprofiler, biobambam2, jcvi, mtnucratio, picard, vep, sentieon, prokka, qc3C, nanostat, samblaster, samtools, sexdeterrmine, eigenstratdatabasetools, bamtools, jellyfish, vcftools, longranger, stacks, varscan2, snippy, umitools, bbmap, bismark, biscuit, diamond, hicexplorer, hicup, hicpro, salmon, kallisto, slamdunk, star, hisat2, tophat, bowtie2, bowtie1, cellranger, snpsplit, odgi, pangolin, nextclade, humid, kat, leehom, adapterRemoval, bbduk, clipandmerge, cutadapt, flexbar, kaiju, kraken, malt, motus, trimmomatic, sickle, skewer, sortmerna, biobloomtools, fastq_screen, afterqc, fastp, fastqc, filtlong, prinseqplusplus, pychopper, porechop, pycoqc, minionqc, anglerfish, multivcfanalyzer, clusterflow, checkqc, bcl2fastq, bclconvert, interop, ivar, flash, seqyclean, optitype, whatshap
+[2023-01-25 15:03:49,179] multiqc                                            [DEBUG  ]  Using temporary directory for creating report: /tmp/tmpc2qh6dvs
+[2023-01-25 15:03:49,347] multiqc                                            [INFO   ]  Search path : /home/harrisonized/github/diy-transcriptomics/data
+[2023-01-25 15:04:18,101] multiqc                                            [DEBUG  ]  Summary of files that were skipped by the search: [skipped_file_contents_search_errors: 1804] // [skipped_module_specific_max_filesize: 308] // [skipped_no_match: 49] // [skipped_ignore_pattern: 11] // [skipped_filesize_limit: 3]
+[2023-01-25 15:04:18,363] multiqc.plots.bargraph                             [DEBUG  ]  Using matplotlib version 3.6.3
+[2023-01-25 15:04:18,363] multiqc.plots.linegraph                            [DEBUG  ]  Using matplotlib version 3.6.3
+[2023-01-25 15:04:18,364] multiqc                                            [DEBUG  ]  No samples found: custom_content
+[2023-01-25 15:04:18,376] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 1 reports
+[2023-01-25 15:04:18,405] multiqc                                            [INFO   ]  Compressing plot data
+[2023-01-25 15:04:18,423] multiqc                                            [INFO   ]  Report      : multiqc_report.html
+[2023-01-25 15:04:18,423] multiqc                                            [INFO   ]  Data        : multiqc_data
+[2023-01-25 15:04:18,423] multiqc                                            [DEBUG  ]  Moving data file from '/tmp/tmpc2qh6dvs/multiqc_data' to '/home/harrisonized/github/diy-transcriptomics/multiqc_data'
+[2023-01-25 15:04:18,490] multiqc                                            [INFO   ]  MultiQC complete
