@@ -1,2 +1,0 @@
-Module	Section	Sample Name	Source
-FastQC	all_sections	data | SRR8668755_1M_subsample	/home/harrisonized/github/diy-transcriptomics/data/SRR8668755_1M_subsample_fastqc.zip
