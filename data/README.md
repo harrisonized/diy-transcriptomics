@@ -1,0 +1,1 @@
+This is the output of  bash/lab_2-map\_reads.sh, but can also be downloaded from here: [https://drive.google.com/file/d/1WUbHa4eQ2gjvBve-wY1SveoVMYt\_MiNq/view?usp=share\_link](https://drive.google.com/file/d/1WUbHa4eQ2gjvBve-wY1SveoVMYt_MiNq/view?usp=share_link)
