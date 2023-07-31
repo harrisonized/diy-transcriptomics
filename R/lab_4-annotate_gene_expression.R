@@ -1,6 +1,6 @@
 library('EnsDb.Hsapiens.v86')
 library('BSgenome.Mfuro.UCSC.musFur1')
-library(biomaRt)
+library('biomaRt')
 
 # set working directory
 wd = '/home/harrisonized/github/diy-transcriptomics'

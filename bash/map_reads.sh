@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -e  # exit on error
 
-
 # params
-export index_filepath='data/lab_2/ref/fasta/Homo_sapiens.GRCh38.cdna.all.index'
-export input_dir="data/lab_2/fastq"
-export output_dir='data/lab_2/mapped_reads'
-export log_dir='logs'
-export troubleshooting=true
+export index_filepath='data/reference_sequences/Homo_sapiens.GRCh38.cdna.all.index'
+export input_dir="data/fastq"
+export output_dir='data/mapped_reads'
+export log_dir='data/mapped_reads/log'
+export troubleshooting=false
 
 # set working directory
 export wd="$HOME/github/diy-transcriptomics"
@@ -16,11 +15,13 @@ pwd
 echo ""
 
 # set conda
-export CONDA=$HOME/anaconda3/etc/profile.d/conda.sh
+export CONDA=$HOME/miniconda3/etc/profile.d/conda.sh
 export CONDA_ENV=rnaseq
 source $CONDA
 conda activate $CONDA_ENV
 
+# kallisto
+export PATH="$HOME/homebrew/bin:$PATH"
 
 # make output_dir if not exists
 if ! test -d "$output_dir" ; then
@@ -28,10 +29,16 @@ if ! test -d "$output_dir" ; then
     echo "TRUE"
 fi
 
+# make log_dir if not exists
+if ! test -d "$log_dir" ; then
+    mkdir $log_dir
+    echo "TRUE"
+fi
+
 
 # for loop
 echo "start time: $(date +'%Y%m%d_%H%M%S')"
-input_files_glob="$input_dir/*"
+input_files_glob="$input_dir/*.fastq.gz"
 declare -a input_files=($input_files_glob)
 for input_file in ${input_files[@]}
 do

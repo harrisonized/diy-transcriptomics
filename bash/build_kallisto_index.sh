@@ -1,7 +1,24 @@
-# FastQC
+#!/usr/bin/env bash
+set -e  # exit on error
 
-# cd diy-transcriptomics
-conda activate rnaseq
+### this used to be lecture_2-generate_multiqc_report.sh
+
+# set working directory
+export wd="$HOME/github/diy-transcriptomics"
+cd $wd
+pwd
+echo ""
+
+# set conda
+export CONDA=$HOME/miniconda3/etc/profile.d/conda.sh
+export CONDA_ENV=rnaseq
+source $CONDA
+conda activate $CONDA_ENV
+
+# kallisto
+export PATH="$HOME/homebrew/bin:$PATH"
+
+# FastQC
 fastqc data/fastq/SRR8668755_1M_subsample.fastq -t 8
 # outputs SRR8668755_1M_subsample_fastqc.html in the same directory
 
@@ -9,7 +26,7 @@ fastqc data/fastq/SRR8668755_1M_subsample.fastq -t 8
 # Kallisto
 
 # indexing
-kallisto index --index='data/lecture_2/ref/fasta/Homo_sapiens.GRCh38.cdna.all.index' data/lecture_2/ref/fasta/Homo_sapiens.GRCh38.cdna.all.fa.gz
+kallisto index --index='data/reference_sequences/Homo_sapiens.GRCh38.cdna.all.index' 'data/reference_sequences/Homo_sapiens.GRCh38.cdna.all.fa.gz'
 
 # [build]loading fasta file data/ref/fasta/Homo_sapiens.GRCh38.cdna.all.fa.gz
 # [build]k-mer length: 31
@@ -42,4 +59,3 @@ multiqc -d data
 # |           multiqc | Report      : multiqc_report.html
 # |           multiqc | Data        : multiqc_data
 # |           multiqc | MultiQC complete
-

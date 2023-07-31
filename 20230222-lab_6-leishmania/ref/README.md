@@ -1,1 +1,0 @@
-These were provided during lecture_6 on PCA for practice. The lab ran this exactly the same way.

@@ -5,3 +5,5 @@ data
 logs
 Untitled.ipynb
 */data
+.DS_Store
+.Rhistory
