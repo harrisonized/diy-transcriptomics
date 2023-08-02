@@ -1,23 +1,27 @@
-# Lab 5
+#!/usr/bin/env bash
+set -e  # exit on error
 
+# set working directory
+export wd="$HOME/github/diy-transcriptomics"
+cd $wd
+pwd
 
-# ----------------------------------------------------------------------
-# Task 1
-
-export DATA_DIR="data/lab_5"
-export FASTQ_FILENAME="SRR8668774_dehosted.fastq.gz"
-export FASTQ_FILE="$DATA_DIR/fastq/$FASTQ_FILENAME"
-export GENOME="$DATA_DIR/ref/genbank-k31.lca.json.gz"
-
-
-# cd diy-transcriptomics
-export CONDA=$HOME/anaconda3/etc/profile.d/conda.sh
+# conda
+export CONDA=$HOME/miniconda3/etc/profile.d/conda.sh
 source $CONDA
 conda activate 'rnaseq'
 
-fastqc data/lab_5/fastq/SRR8668774_dehosted.fastq.gz -t 8
+# this follows lab 5: https://diytranscriptomics.com/lab/lab-05
 
+# ----------------------------------------------------------------------
+# Task 1: Use fastqc to get a summary
 
+export DATA_DIR="data/lab_5"
+export FASTQ_FILENAME="SRR8668774_dehosted.fastq.gz"
+export FASTQ_FILE="$DATA_DIR/$FASTQ_FILENAME"
+export GENOME_FILE="$DATA_DIR/reference_sequences/genbank-k31.lca.json.gz"
+
+fastqc data/lab_5/SRR8668774_dehosted.fastq.gz -t 8
 
 # ----------------------------------------------------------------------
 # Task 2
@@ -28,7 +32,7 @@ mv "$FASTQ_FILENAME.sig" "data/lab_5/$FASTQ_FILENAME.sig"
 
 # time = ~2min
 # no output?
-sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME
+sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME_FILE
 # == This is sourmash version 4.6.1. ==
 # == Please cite Brown and Irber (2016), doi:10.21105/joss.00027. ==
 
@@ -56,7 +60,8 @@ sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME
 # once this is done, try rerunning with an additional argument 
 # to relax the threshold used for classification: '--threshold-bp 100'
 # no output?
-sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME --threshold-bp 100
+sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME_FILE \
+--threshold-bp 100
 # == This is sourmash version 4.6.1. ==
 # == Please cite Brown and Irber (2016), doi:10.21105/joss.00027. ==
 
@@ -103,16 +108,22 @@ sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME --threshold-bp 10
 # Task 3
 
 export CENTRIFUGE_OUTPUT='CL13_dehosted'
-conda activate 'centrifuge'
+conda activate 'rnaseq'
 
 # time = ~10min
 # If you haven't done so already, unzip the file you downloaded above to get a folder. 
 # Move the three files present in this folder to your working directory where your dehosted fastq file is located.
 # see: https://www.biostars.org/p/399916/
-centrifuge -x "$DATA_DIR/p_compressed+h+v/p_compressed+h+v" \
+
+# make output_dir if not exists
+if ! test -d "$DATA_DIR/centrifuge" ; then
+    mkdir $DATA_DIR/centrifuge
+    echo "TRUE"
+fi
+centrifuge -x "$DATA_DIR/reference_sequences/p_compressed+h+v/p_compressed+h+v" \
     -U $FASTQ_FILE \
-    --report-file "$DATA_DIR/centrifuge/$CENTRIFUGE_OUTPUT_report.txt" \
-    -S "$DATA_DIR/centrifuge/$CENTRIFUGE_OUTPUT_results.txt"
+    --report-file "$DATA_DIR/centrifuge/${CENTRIFUGE_OUTPUT}_report.txt" \
+    -S "$DATA_DIR/centrifuge/${CENTRIFUGE_OUTPUT}_results.txt"
 # once done running, open the 'CL13_dehosted_results.txt'
 # ouput file in Excel and sort based on 'numUniqueReads' column
 
@@ -134,7 +145,7 @@ export FASTQ_FILE="$DATA_DIR/fastq/$FASTQ_FILENAME"
 sourmash sketch dna -p scaled=10000,k=31,abund $FASTQ_FILE --name-from-first
 mv "$FASTQ_FILENAME.sig" "$DATA_DIR/$FASTQ_FILENAME.sig"
 
-sourmash gather -k 31 "$DATA_DIR/$FASTQ_FILENAME.sig" $GENOME --threshold-bp 100
+sourmash gather -k 31 "$DATA_DIR/$FASTQ_FILENAME.sig" $GENOME_FILE --threshold-bp 100
 # == This is sourmash version 4.6.1. ==
 # == Please cite Brown and Irber (2016), doi:10.21105/joss.00027. ==
 
@@ -600,7 +611,7 @@ export FASTQ_FILE="$DATA_DIR/fastq/$FASTQ_FILENAME"
 sourmash sketch dna -p scaled=10000,k=31,abund $FASTQ_FILE --name-from-first
 mv "$FASTQ_FILENAME.sig" "$DATA_DIR/$FASTQ_FILENAME.sig"
 
-sourmash gather -k 31 "$DATA_DIR/$FASTQ_FILENAME.sig" $GENOME --threshold-bp 100
+sourmash gather -k 31 "$DATA_DIR/$FASTQ_FILENAME.sig" $GENOME_FILE --threshold-bp 100
 # == This is sourmash version 4.6.1. ==
 # == Please cite Brown and Irber (2016), doi:10.21105/joss.00027. ==
 

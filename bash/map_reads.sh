@@ -61,8 +61,12 @@ do
         echo ""
     else
         echo "Processing $input_file ... $current_time"
-        kallisto quant --index=$index_filepath --output-dir=$output_subdir \
-        	-t 8 --single -l 250 -s 30 $input_file &> "$log_dir/$log_filepath"
+
+        kallisto quant --index=$index_filepath \
+        --output-dir=$output_subdir \
+        -t 8 --single -l 250 -s 30 \
+        $input_file &> "$log_dir/$log_filepath"
+
     fi
 
 done
