@@ -22,6 +22,7 @@ install.packages('hexbin')
 install.packages('cowplot')
 install.packages('gt')
 install.packages('DT')
+install.packages("tidyverse")
 ```
 
 Installing the RNAseq conda environment:
@@ -68,8 +69,8 @@ To be run in order:
 | 1 | bash/build\_kallisto\_index.sh | Lecture 2 | Use Kallisto to build an index |
 | 2 | bash/map\_reads.sh | Lab 2 | Use Kallisto to map reads to the index file |
 | 3 | bash/estimate\_sequence\_similarity.sh | Lab 5 | Use Sourmash to identify non-human reads. Use Centrifuge to search for gene signatures. |
-| 4 | R/annotate_gene_expression.R | Lab 4 | Use the ferret genome to annotate the leishmania dataset |
-| 5 | `Rscript R/Step1_TxImport.R` | Lab 6 ||| 6 | `Rscript R/Step2_dataWrangling.R` | Lab 6 ||| 7 | `Rscript R/Step3_multivariate.R` | Lab 6 ||
-| 8 | `Rscript R/lab_7.R  # standalone` | Lab 7 ||
-| 9 | `Rscript R/lab_9-malaria.R` | Lab 9 ||
+| 4 | R/annotate\_gene\_expression.R | Lab 4 | Use the ferret genome to annotate the leishmania dataset |
+| 5 | concat_data.R | Lab 6 ||| 6 | clean_data.R | Lab 6 ||| 7 | Rscript R/Step3_multivariate.R | Lab 6 ||
+| 8 | Rscript R/lab_7.R  # standalone` | Lab 7 ||
+| 9 | Rscript R/lab_9-malaria.R | Lab 9 ||
 

@@ -47,7 +47,7 @@ Txi_gene <- tximport::tximport(
     files,  # load data from mapped_reads
     type = "kallisto", 
     tx2gene = Tx,
-    txOut = TRUE,  # How does the result change if this =FALSE vs =TRUE?  # if this is false, it doesn't work
+    txOut = TRUE,  # if this is false, it doesn't work
     countsFromAbundance = "lengthScaledTPM",
     ignoreTxVersion = TRUE
 )
