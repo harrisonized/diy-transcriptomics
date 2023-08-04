@@ -5,6 +5,7 @@
 # # filter_list_for_match
 
 
+# list all files in a directory
 list_files <- function(dir_path, ext=NULL, recursive = TRUE) {
     all_files = list.files(dir_path, recursive = recursive, full.name=TRUE)
 
@@ -17,8 +18,8 @@ list_files <- function(dir_path, ext=NULL, recursive = TRUE) {
 }
 
 
+# python equivalent: [string for string in items if re.match(pattern, string)]
 filter_list_for_match <- function(items, pattern) {
-    # filter
     for (i in 1:length(pattern)){
         items <- lapply(items, grep, pattern=pattern[[i]], value=TRUE)
     }

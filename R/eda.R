@@ -1,8 +1,7 @@
 # EDA plots
 # This combines 
 
-wd = dirname(this.path::here()) 
-# wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 source(file.path(wd, 'R', 'utils.R'))
 # library(tidyverse)  # too broad
 library('readr')  # read_tsv
@@ -14,7 +13,7 @@ library('cowplot')  # plot_grid
 
 library('tximport')  # tx_import
 suppressMessages(library('EnsDb.Hsapiens.v86'))
-suppressMessages(library('edgeR'))  # DGElist
+suppressMessages(library('edgeR'))  # DGElist, cpm
 library('optparse')
 library('logr')
 
@@ -30,7 +29,7 @@ opt = parse_args(opt_parser)
 # ----------------------------------------------------------------------
 # Pre-script settings
 
-save = opt['save'][[1]]
+save = opt['save'][[1]]  # save=FALSE
 
 # Start Log
 start_time = Sys.time()
@@ -39,60 +38,71 @@ log_print(paste('Script started at:', start_time))
 
 
 # ----------------------------------------------------------------------
-# Read data
+# Concatenate data
 # Adapted from Step1_TxImport.R
 
 log_print(paste(Sys.time(), 'Reading files...'))
-
-# get abundance.tsv files
-targets <- readr::read_tsv(file.path(wd, 'data', 'schistosoma', "studyDesign.txt"))
-# filepaths <- file.path(wd, 'data/schistosoma/mapped_reads', targets$sample, "abundance.tsv")
-# all(file.exists(paths))  # check that the files exist 
 
 # get human annotations
 Tx <- as_tibble(transcripts(EnsDb.Hsapiens.v86, columns=c("tx_id", "gene_name")))
 Tx <- dplyr::rename(Tx, target_id = tx_id)  #need to change first column name to 'target_id'
 Tx <- dplyr::select(Tx, "target_id", "gene_name")  #transcript ID needs to be the first column in the dataframe
 
-# import Kallisto transcript counts
-filepaths = filter_list_for_match(
+# Example file: "data/schistosoma/mapped_reads/F12h_LE_1/abundance.tsv"
+#   target_id    length eff_length est_counts   tpm
+#   <chr>         <dbl>      <dbl>      <dbl> <dbl>
+# 1 Smp_186980.1    402      239.       171   58.5 
+# 2 Smp_197050.1    186       50.3       59   95.8 
+# 3 Smp_160500.1   5316     5152.       244    3.87
+abundance_filepaths = filter_list_for_match(
     list_files(file.path(wd, "data", "schistosoma", "mapped_reads")),
-    'abundance.tsv'  # file_ext
+    'abundance.h5'
 )
-Txi_gene <- tximport(
-    filepaths,
+sample_ids = unlist(lapply(filepaths, function(x) basename(dirname(x))))
+# targets <- readr::read_tsv(file.path(wd, 'data', 'schistosoma', "studyDesign.txt"))  # don't need this
+
+# Read abundance files into a txi object
+# see: https://github.com/mikelove/tximport/blob/devel/R/tximport.R
+# names(txi)
+# [1] "abundance"  "counts"  "infReps"  "length"  "countsFromAbundance
+# txi$abundance = tpm
+# txi$counts != counts, they did something
+# txi$infReps: inferential replicates, not sure what this is
+# txi$length = eff_length
+# txi$countsFromAbundance = "lengthScaledTPM"
+txi <- tximport(
+    abundance_files,
     type = "kallisto", 
     tx2gene = Tx, 
     txOut = TRUE,  # doesn't work when this is FALSE
     countsFromAbundance = "lengthScaledTPM",
     ignoreTxVersion = TRUE
-)  # 144 files
+)
+# update column names, they're not included
+colnames(txi$counts) <- unlist(lapply(sample_ids, function(x) paste(x, '_count', sep='')))
+colnames(txi$abundance) <- unlist(lapply(sample_ids, function(x) paste(x, '_abundance', sep='')))
+colnames(txi$length) <- unlist(lapply(sample_ids, function(x) paste(x, '_length', sep='')))
 
-# export gene_counts
-colnames(Txi_gene$counts) <- targets$sample
+# Inspect
+# head(txi$counts)
+
+# Save
 if (save==TRUE) {
-    write.table(
-        Txi_gene$counts,
-        file.path(wd, 'data', 'schistosoma', 'gene_counts.csv'),
-        quote=FALSE, col.names=TRUE, row.names=TRUE, sep=','
-    )
+    log_print(paste(Sys.time(), 'Saving txi files...'))
+    if (!dir.exists(file.path(wd, 'data', 'schistosoma', 'txi'))) {
+        dir.create(file.path(wd, 'data', 'schistosoma', 'txi'), recursive=TRUE)
+    }
+    write.table(txi$counts,
+                file.path(wd, 'data', 'schistosoma', 'txi', 'txi_counts.csv'),
+                quote=FALSE, col.names=TRUE, row.names=TRUE, sep=',')
+    write.table(txi$abundance,
+                file.path(wd, 'data', 'schistosoma', 'txi', 'txi_abundances.csv'),
+                quote=FALSE, col.names=TRUE, row.names=TRUE, sep=',')
+    # write.table(txi$length,
+    #             file.path(wd, 'data', 'schistosoma', 'txi', 'txi_lengths.csv'),
+    #             quote=FALSE, col.names=TRUE, row.names=TRUE, sep=',')
 }
 
-# export gene_abundances
-colnames(Txi_gene$abundance) <- targets$sample
-# Txi_gene_abundance <- transform(
-#     Txi_gene$abundance,
-#     SD=rowSds(Txi_gene$abundance),
-#     AVG=rowMeans(Txi_gene$abundance),
-#     MED=rowMedians(Txi_gene$abundance)
-# )
-if (save==TRUE) {
-    write.table(
-        Txi_gene$abundance, 
-        file.path(wd, 'data', 'schistosoma', 'gene_abundances.csv'),
-        quote=FALSE, col.names=TRUE, row.names=TRUE, sep=','
-    )
-}
 
 # ----------------------------------------------------------------------
 # Plot unfiltered counts
@@ -100,21 +110,21 @@ if (save==TRUE) {
 log_print(paste(Sys.time(), 'Plotting unfiltered counts...'))
 
 # Generate summary stats
-Txi_gene$abundance <- transform(
-    Txi_gene$abundance,
-    SD=rowSds(Txi_gene$abundance),
-    AVG=rowMeans(Txi_gene$abundance),
-    MED=rowMedians(Txi_gene$abundance)
+txi$abundance <- transform(
+    txi$abundance,
+    SD=rowSds(txi$abundance),
+    AVG=rowMeans(txi$abundance),
+    MED=rowMedians(txi$abundance)
 )
 
 # inspect
-# head(Txi_gene$abundance)
-# colSums(Txi_gene$abundance)
-# colSums(Txi_gene$counts)
+# head(txi$abundance)
+# colSums(txi$abundance)
+# colSums(txi$counts)
 
 # Plot tpm unfiltered, non-normalized data
 # Let's expand on the plot above a bit more and take a look at each 'layer' of the ggplot code
-fig <- ggplot(Txi_gene$abundance) + 
+fig <- ggplot(txi$abundance) + 
     aes(x = SD, y = MED) +
     geom_point(shape=16, size=2) +
     geom_smooth(method=lm) +
@@ -139,7 +149,7 @@ if (save==TRUE) {
 log_print(paste(Sys.time(), 'Plotting unfiltered, un-normalized cpm...'))
 
 # Create DGElist
-myDGEList <- edgeR::DGEList(Txi_gene$counts)
+myDGEList <- edgeR::DGEList(txi$counts)
 
 # note: this doesn't work
 if (FALSE) {
