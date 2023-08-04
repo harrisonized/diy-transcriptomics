@@ -194,7 +194,7 @@ fig <- ggplot(txi$abundance) +
     theme_bw()
 
 if (save==TRUE) {
-    ggsave(file.path(wd, 'figures', 'schistosoma', 'fig.png'),
+    ggsave(file.path(wd, 'figures', 'schistosoma', 'eda', 'tpm_unfiltered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -217,7 +217,7 @@ p1 <- ggplot(log2.cpm.df.pivot) +
        ) +
   theme_bw()
 if (save==TRUE) {
-    ggsave(file.path(wd, 'figures', 'schistosoma', 'p1.png'),
+    ggsave(file.path(wd, 'figures', 'schistosoma', 'eda', 'cpm_unfiltered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -241,7 +241,7 @@ p2 <- ggplot(log2.cpm.filtered.df.pivot) +
 # Also: try using coord_flip() at the end of the ggplot code
 
 if (save==TRUE) {
-    ggsave(file.path(wd, 'figures', 'schistosoma', 'p2.png'),
+    ggsave(file.path(wd, 'figures', 'schistosoma', 'eda', 'tpm_filtered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -263,7 +263,7 @@ p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
        caption=paste0("produced on ", Sys.time())) +
   theme_bw()
 if (save==TRUE) {
-    ggsave(file.path(wd, 'figures', 'schistosoma', 'p3.png'),
+    ggsave(file.path(wd, 'figures', 'schistosoma', 'eda', 'tpm_filtered_normalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -271,7 +271,7 @@ if (save==TRUE) {
 log_print(paste(Sys.time(), 'Plotting cowplot...'))
 cowplot::plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
 if (save==TRUE) {
-    ggsave(file.path(wd, 'figures', 'schistosoma', 'cowplot.png'),
+    ggsave(file.path(wd, 'figures', 'schistosoma', 'eda', 'cowplot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 

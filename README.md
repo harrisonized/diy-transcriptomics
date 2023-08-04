@@ -23,6 +23,7 @@ install.packages('cowplot')
 install.packages('gt')
 install.packages('DT')
 install.packages("tidyverse")
+install.packages("plotly")
 ```
 
 Installing the RNAseq conda environment:
