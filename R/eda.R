@@ -116,10 +116,11 @@ txi$abundance <- transform(
 # Create DGElist
 # See: https://www.rdocumentation.org/packages/edgeR/versions/3.14.0/topics/DGEList-class
 dge_list <- edgeR::DGEList(txi$counts)
-if (save==TRUE) {
-    # This doesn't work:
-    # save(dge_list, file=file.path(wd, 'data', 'schistosoma', "dge_list.txt"))
-    # load(file=file.path(wd, 'data', 'schistosoma', "dge_list.txt"))  # example load
+
+# note: this doesn't work for some reason
+if (FALSE) {
+    save(dge_list, file=file.path(wd, 'data', 'schistosoma', "dge_list.txt"))
+    load(file=file.path(wd, 'data', 'schistosoma', "dge_list.txt"))  # example load
 }
 
 # unfiltered, non-normalized cpm
@@ -156,21 +157,25 @@ log2.cpm.filtered.df.pivot <- pivot_longer(log2.cpm.filtered.df, # dataframe to 
 # need this for the next script
 dge_list.filtered.norm <- calcNormFactors(dge_list.filtered, method = "TMM")
 log2.cpm.filtered.norm <- cpm(dge_list.filtered.norm, log=TRUE)
-log2.cpm.filtered.norm.df <- as_tibble(log2.cpm.filtered.norm, rownames = "geneID")
-colnames(log2.cpm.filtered.norm.df) <- c("geneID", sample_ids)
+log2.cpm.filtered.norm.df <- as_tibble(log2.cpm.filtered.norm, rownames = "gene_ID")
+colnames(log2.cpm.filtered.norm.df) <- c("gene_ID", sample_ids)
+
+if (save==TRUE) {
+    log_print(paste(Sys.time(), 'Saving filtered, normalized cpm...'))
+    write.table(
+        log2.cpm.filtered.norm.df,
+        file.path(wd, 'data', 'schistosoma', 'filtered_normalized_cpm.csv'),
+        quote=FALSE, col.names=TRUE, row.names=FALSE, sep=','
+    )
+}
+
+
 log2.cpm.filtered.norm.df.pivot <- pivot_longer(
     log2.cpm.filtered.norm.df, # dataframe to be pivoted
     cols = colnames(log2.cpm.df[, c(2 :length(log2.cpm.df))]), # column names to be stored as a SINGLE variable
     names_to = "samples", # name of that new variable (column)
     values_to = "expression"
 ) # name of new variable (column) storing all the values (data)
-
-if (save==TRUE) {
-    log_print(paste(Sys.time(), 'Saving filtered, normalized cpm...'))
-    write.table(log2.cpm.filtered.norm.df,
-                file.path(wd, 'data', 'schistosoma', 'filtered_normalized_cpm.csv'),
-                quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
-}
 
 
 # ----------------------------------------------------------------------

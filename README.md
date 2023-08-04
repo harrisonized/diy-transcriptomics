@@ -71,7 +71,7 @@ To be run in order:
 | 2 | bash/map\_reads.sh | Lab 2 | Use Kallisto to map reads to the index file |
 | 3 | bash/estimate\_sequence\_similarity.sh | Lab 5 | Use Sourmash to identify non-human reads. Use Centrifuge to search for gene signatures. |
 | 4 | R/annotate\_gene\_expression.R | Lab 4 | Use the ferret genome to annotate the leishmania dataset |
-| 5 | concat_data.R | Lab 6 ||| 6 | clean_data.R | Lab 6 ||| 7 | Rscript R/Step3_multivariate.R | Lab 6 ||
-| 8 | Rscript R/lab_7.R  # standalone` | Lab 7 ||
+| 5 | eda.R | Lab 6 | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | pca.R | Lab 6 | Performs PCA, then there are examples from gt, DT, and plotly. |
+| 8 | Rscript R/lab_7.R | Lab 7 ||
 | 9 | Rscript R/lab_9-malaria.R | Lab 9 ||
 

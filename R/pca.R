@@ -3,6 +3,8 @@
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 source(file.path(wd, 'R', 'utils.R'))
 # library(tidyverse) # too broad
+library('tibble')
+library('tidyr')
 library('dplyr')
 library('gt') # publication quality tables
 library('DT') # for making interactive tables
@@ -26,7 +28,7 @@ save = opt['save'][[1]]  # save=FALSE
 
 # Start Log
 start_time = Sys.time()
-log <- log_open(paste("eda ", start_time, '.log', sep=''))
+log <- log_open(paste("pca ", start_time, '.log', sep=''))
 log_print(paste('Script started at:', start_time))
 
 
@@ -53,9 +55,12 @@ timpoint <- study_design$timpoint
 # ----------------------------------------------------------------------
 # Hierarchical Clustering
 
-# other distance methods are "euclidean", maximum", "manhattan", "canberra", "binary" or "minkowski"
-distance <- dist(t(log2.cpm.filtered.norm), method = "maximum")
-# other agg methods are "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", or "centroid"
+# distance methods: "euclidean", maximum", "manhattan", "canberra", "binary", "minkowski"
+# agg methods: "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"
+distance <- dist(
+    t(log2.cpm.filtered.norm.df[, !names(log2.cpm.filtered.norm.df)=='gene_ID']),
+    method = "maximum"
+)
 clusters <- hclust(distance, method = "average")
 
 # plot and save dendrogram
@@ -72,7 +77,10 @@ if (save==TRUE) {
 # Perform PCA
 
 # pca_result
-pca_result <- prcomp(t(log2.cpm.filtered.norm), scale.=F, retx=T)
+pca_result <- prcomp(
+    t(log2.cpm.filtered.norm.df[, !names(log2.cpm.filtered.norm.df)=='gene_ID']),
+    scale.=F, retx=T
+)
 
 # Inspect
 # ls(pca_result)
@@ -87,7 +95,7 @@ pca_result <- prcomp(t(log2.cpm.filtered.norm), scale.=F, retx=T)
 # plot and save screeplot, basically a histogram
 if (save==TRUE) {
     png(file.path(wd, 'figures', 'schistosoma', 'pca', 'screeplot.png'))
-    screeplot(pca.res)
+    screeplot(pca_result)
     dev.off()
 }
 
@@ -106,7 +114,7 @@ fig <- ggplot(pca_result.df) +
     xlab(paste0("PC1 (",pct_variance[1],"%",")")) + 
     ylab(paste0("PC2 (",pct_variance[2],"%",")")) +
     labs(title="PCA plot",
-       caption=paste0("produced on ", Sys.time())) +
+         caption=paste0("produced on ", Sys.time())) +
     # coord_fixed() +
     theme_bw()
 if (save==TRUE) {
@@ -128,7 +136,7 @@ pca.pivot <- pivot_longer(pca_result.df, # dataframe to be pivoted
                           names_to = "PC", # name of that new variable (column)
                           values_to = "loadings") # name of new variable (column) storing all the values (data)
 
-ggplot(pca.pivot) +
+fig2 <- ggplot(pca.pivot) +
     aes(x=sample, y=loadings, fill=group) +
     geom_bar(stat="identity") +
     facet_wrap(~PC) +
@@ -137,7 +145,7 @@ ggplot(pca.pivot) +
     theme_bw() +
     coord_flip()
 if (save==TRUE) {
-    ggsave(file.path(wd, 'figures', 'schistosoma', 'pca_small_multiples_plot.png'),
+    ggsave(file.path(wd, 'figures', 'schistosoma', 'pca', 'pca_small_multiples_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -153,22 +161,26 @@ mydata.df <- log2.cpm.filtered.norm.df %>%
 
 mydata.sort <- mydata.df %>%
     arrange(desc(LogFC)) %>% 
-    select(geneID, LogFC)
+    dplyr::select(gene_ID, LogFC)
 
-# Pick out genes of interest 
+# Pick out genes of interest
+# There's a bug here
+# gene_id = Smp_186980.1 , ...
+# so it filters out everything
+# to be fixed
 mydata.filter <- mydata.df %>%
-    filter(
-        geneID=="MMP1" | geneID=="GZMB" | geneID=="IL1B" | geneID=="GNLY" | geneID=="IFNG" |
-        geneID=="CCL4" | geneID=="PRF1" | geneID=="APOBEC3A" | geneID=="UNC13A"
+    dplyr::filter(
+        gene_ID=="MMP1" | gene_ID=="GZMB" | gene_ID=="IL1B" | gene_ID=="GNLY" | gene_ID=="IFNG" |
+        gene_ID=="CCL4" | gene_ID=="PRF1" | gene_ID=="APOBEC3A" | gene_ID=="UNC13A"
     ) %>%
-    select(geneID, mctl.AVG, fctl.AVG, LogFC) %>%
+    dplyr::select(gene_ID, mctl.AVG, fctl.AVG, LogFC) %>%
     arrange(desc(LogFC))
 
 # you can also filter based on any regular expression
 mydata.grep <- mydata.df %>%
-    filter(grepl('CXCL|IFI', geneID)) %>%
-    select(geneID, mctl.AVG, fctl.AVG, LogFC) %>%
-    arrange(desc(geneID))
+    dplyr::filter(grepl('CXCL|IFI', gene_ID)) %>%
+    dplyr::select(gene_ID, mctl.AVG, fctl.AVG, LogFC) %>%
+    arrange(desc(gene_ID))
 
 
 # ----------------------------------------------------------------------
@@ -183,17 +195,17 @@ mydata.filter %>%
     tab_footnote(
         footnote = "Deletion or blockaid ameliorates disease in mice",
         locations = cells_body(
-        columns = geneID,
+        columns = gene_ID,
         rows = c(6, 7))) %>% 
     tab_footnote(
         footnote = "Associated with treatment failure in multiple studies",
         locations = cells_body(
-        columns = geneID,
+        columns = gene_ID,
         rows = c(2:9))) %>%
     tab_footnote(
         footnote = "Implicated in parasite control",
         locations = cells_body(
-        columns = geneID,
+        columns = gene_ID,
         rows = c(2))) %>%
     tab_source_note(
         source_note = md("Reference: Amorim *et al*., (2019). DOI: 10.1126/scitranslmed.aar3619"))
@@ -217,7 +229,7 @@ DT::datatable(mydata.df[,c(1,12:14)],
 
 fig <- ggplot(mydata.df) +
   aes(x=mctl.AVG, y=fctl.AVG, 
-      text = paste("Symbol:", geneID)) +
+      text = paste("Symbol:", gene_ID)) +
   geom_point(shape=16, size=1) +
   ggtitle("disease vs. healthy") +
   theme_bw()
