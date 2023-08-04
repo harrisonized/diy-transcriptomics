@@ -1,27 +1,19 @@
-# Introduction to this script -----------
-# this script walks thorough techniques for data exploration and expands on last week's data wrangling theme
-# we'll also continue to create publication-quality graphics
-# This script starts with your filtered and normalized abundance data from the Step 2 script.
+## This was Step3_multivariate.R
 
-# Load packages ------
-library(tidyverse) # you're familiar with this fromt the past two lectures
+library(tidyverse) # very broad
+library(plotly)
 library(DT) # for making interactive tables
-library(plotly) # for making interactive plots
-library(gt) # A layered 'grammar of tables' - think ggplot, but for tables
+library(gt) # table functions
 
-# Identify variables of interest in study design file ----
-targets
-group <- targets$sex
+
+# Read in study design file
+study_design <- readr::read_tsv(file.path(wd, 'data', 'schistosoma', "studyDesign.txt"))
+group <- study_design$sex
 group <- factor(group)
+timpoint <- study_design$timpoint
 
-
-timpoint <- targets$timpoint
-
-# Prepare your data -------
-# for this part of the class you'll use your normalized and filtered data in log2 cpm
-# make sure you have this object already in your work environment
-# if you don't, go back to the Step2 script and generate it
-log2.cpm.filtered.norm.df
+# need this from the previous step
+log2.cpm.filtered.norm.df <- readr::read_csv(file.path(wd, 'data', 'schistosoma', "filtered_normalized_cpm.csv"))
 
 # Hierarchical clustering ---------------
 #hierarchical clustering can only work on a data matrix, not a data frame
@@ -204,7 +196,7 @@ library(DT)
 library(gt)
 library(plotly)
 
-group <- targets$sex
+group <- study_design$sex
 group <- factor(group)
 
 pca.res <- prcomp(t(log2.cpm.filtered.norm), scale.=F, retx=T)
