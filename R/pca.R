@@ -163,11 +163,10 @@ mydata.sort <- mydata.df %>%
     arrange(desc(LogFC)) %>% 
     dplyr::select(gene_ID, LogFC)
 
-# Pick out genes of interest
-# There's a bug here
+
+# Filter examples
+# BUG: there are no gene names in the data, so this filters out everything
 # gene_id = Smp_186980.1 , ...
-# so it filters out everything
-# to be fixed
 mydata.filter <- mydata.df %>%
     dplyr::filter(
         gene_ID=="MMP1" | gene_ID=="GZMB" | gene_ID=="IL1B" | gene_ID=="GNLY" | gene_ID=="IFNG" |
@@ -186,8 +185,13 @@ mydata.grep <- mydata.df %>%
 # ----------------------------------------------------------------------
 # gt table example
 
-gt(mydata.filter)
-mydata.filter %>%
+gt_table_1 <- gt(mydata.df[1:50, ])
+gtsave(gt_table_1,
+       'gt_example_1.png',
+       path=file.path(wd, 'figures', 'schistosoma')
+)
+
+gt_table_2 <- mydata.df[1:50, ] %>%
     gt() %>%
     fmt_number(columns=2:4, decimals = 1) %>%
     tab_header(title = md("**Regulators of skin pathogenesis**"),
@@ -209,6 +213,10 @@ mydata.filter %>%
         rows = c(2))) %>%
     tab_source_note(
         source_note = md("Reference: Amorim *et al*., (2019). DOI: 10.1126/scitranslmed.aar3619"))
+gtsave(gt_table_2,
+       'gt_example_2.png',
+       path=file.path(wd, 'figures', 'schistosoma')
+)
 
 
 # ----------------------------------------------------------------------
