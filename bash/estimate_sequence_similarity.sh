@@ -16,23 +16,23 @@ conda activate 'rnaseq'
 # ----------------------------------------------------------------------
 # Task 1: Use fastqc to get a summary
 
-export DATA_DIR="data/lab_5"
+export DATA_DIR="data/leishmania_revisited"
 export FASTQ_FILENAME="SRR8668774_dehosted.fastq.gz"
 export FASTQ_FILE="$DATA_DIR/$FASTQ_FILENAME"
 export GENOME_FILE="$DATA_DIR/reference_sequences/genbank-k31.lca.json.gz"
 
-fastqc data/lab_5/SRR8668774_dehosted.fastq.gz -t 8
+fastqc data/leishmania_revisited/SRR8668774_dehosted.fastq.gz -t 8
 
 # ----------------------------------------------------------------------
 # Task 2
 
 # time = ~2min to sketch ~9M reads
 sourmash sketch dna -p scaled=10000,k=31,abund $FASTQ_FILE --name-from-first
-mv "$FASTQ_FILENAME.sig" "data/lab_5/$FASTQ_FILENAME.sig"
+mv "$FASTQ_FILENAME.sig" "data/leishmania_revisited/$FASTQ_FILENAME.sig"
 
 # time = ~2min
 # no output?
-sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME_FILE
+sourmash gather -k 31 "data/leishmania_revisited/$FASTQ_FILENAME.sig" $GENOME_FILE
 # == This is sourmash version 4.6.1. ==
 # == Please cite Brown and Irber (2016), doi:10.21105/joss.00027. ==
 
@@ -60,7 +60,7 @@ sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME_FILE
 # once this is done, try rerunning with an additional argument 
 # to relax the threshold used for classification: '--threshold-bp 100'
 # no output?
-sourmash gather -k 31 "data/lab_5/$FASTQ_FILENAME.sig" $GENOME_FILE \
+sourmash gather -k 31 "data/leishmania_revisited/$FASTQ_FILENAME.sig" $GENOME_FILE \
 --threshold-bp 100
 # == This is sourmash version 4.6.1. ==
 # == Please cite Brown and Irber (2016), doi:10.21105/joss.00027. ==
@@ -593,7 +593,7 @@ centrifuge -x "$DATA_DIR/p_compressed+h+v/p_compressed+h+v" \
     -U $FASTQ_FILE \
     --report-file "$DATA_DIR/centrifuge/${CENTRIFUGE_OUTPUT}_report.txt" \
     -S "$DATA_DIR/centrifuge/${CENTRIFUGE_OUTPUT}_results.txt"
-# report file data/lab_5/centrifuge/SRR11207265_1_report.txt
+# report file data/leishmania_revisited/centrifuge/SRR11207265_1_report.txt
 # Number of iterations in EM algorithm: 53
 # Probability diff. (P - P_prev) in the last iteration: 7.22319e-11
 # Calculating abundance: 00:00:00
@@ -661,7 +661,7 @@ centrifuge -x "$DATA_DIR/hvc/hvc" \
     -U $FASTQ_FILE \
     --report-file "$DATA_DIR/centrifuge/${CENTRIFUGE_OUTPUT}_report.txt" \
     -S "$DATA_DIR/centrifuge/${CENTRIFUGE_OUTPUT}_results.txt"
-# report file data/lab_5/centrifuge/SRR12596172_1_report.txt
+# report file data/leishmania_revisited/centrifuge/SRR12596172_1_report.txt
 # Number of iterations in EM algorithm: 14
 # Probability diff. (P - P_prev) in the last iteration: 0
 # Calculating abundance: 00:00:00
