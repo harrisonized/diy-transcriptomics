@@ -75,6 +75,7 @@ Listed in chronological order:
 | 4 | Lab 4 | R/leishmania_annotate\_gene\_expression.R | Use the ferret genome to annotate the leishmania dataset |
 | 5 | Lab 6 | R/schistosoma_eda.R | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | Lab 6 | R/schistosoma_pca.R | Performs PCA, then there are examples from gt, DT, and plotly. |
 | 8 | Lab 7 | R/lemis_eda.R | EDA on the lemis dataset. |
-| 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. Placeholder for now. |
-| 10 | Lab 10 | R/covid19_eda.R | EDA on the covid19 dataset. Placeholder for now. |
-| 10 | Lab 13 | R/covid19_scrnaseq.R | scRNAseq analysis on covid19_scrnaseq dataset. Placeholder for now. |
+| 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
+| 10 | Lab 9 | R/malaria_pca.R | EDA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
+| 11 | Lab 10 | R/covid19_eda.R | EDA on the covid19 dataset. Placeholder for now. |
+| 12 | Lab 13 | R/covid19_scrnaseq.R | scRNAseq analysis on covid19_scrnaseq dataset. Placeholder for now. |

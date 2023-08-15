@@ -219,8 +219,8 @@ if (save==TRUE) {
 results <- decideTests(ebFit, method="global", adjust.method="BH", p.value=0.01, lfc=1)
 
 # take a look at what the results of decideTests looks like
-head(results)
-summary(results)
+# head(results)
+# summary(results)
 vennDiagram(results[, 1:4], include="up")
 if (save==TRUE) {
     ggsave(file.path(wd, 'figures', 'malaria', 'pca', 'venn_diagram.png'),
@@ -232,12 +232,12 @@ if (save==TRUE) {
 # Data Table
 
 # retrieve expression data for your DEGs
-head(v.DEGList.filtered.norm$E)
+# head(v.DEGList.filtered.norm$E)
 colnames(v.DEGList.filtered.norm$E) <- sampleLabels
 
 diffGenes <- v.DEGList.filtered.norm$E[results[,1] !=0 | results[,3] !=0 | results[,4] !=0 | results[,5] !=0 | results[,6] !=0,]
-head(diffGenes)
-dim(diffGenes)
+# head(diffGenes)
+# dim(diffGenes)
 #convert your DEGs to a dataframe using as_tibble
 diffGenes.df <- as_tibble(diffGenes, rownames = "geneID")
 
@@ -267,20 +267,23 @@ clustColumns <- hclust(as.dist(1-cor(diffGenes, method="spearman")), method="com
 module.assign <- cutree(clustRows, k=2)
 module.color <- rainbow(length(unique(module.assign)), start=0.1, end=0.9) 
 module.color <- module.color[as.vector(module.assign)] 
-fig <- heatmap.2(
-    diffGenes, 
-    Rowv=as.dendrogram(clustRows), 
-    Colv=as.dendrogram(clustColumns),
-    RowSideColors=module.color,
-    col=myheatcolors, scale='row', labRow=NA,
-    density.info="none", trace="none",  
-    cexRow=1, cexCol=1,
-    margins=c(8,20)
-)
 
+
+# plot and save dendrogram
 if (save==TRUE) {
-    ggsave(file.path(wd, 'figures', 'malaria', 'pca', 'venn_diagram.png'),
-           height=750, width=1200, dpi=300, units="px", scaling=0.5)
+    # see: http://www.sthda.com/english/wiki/creating-and-saving-graphs-r-base-graphs
+    png(file.path(wd, 'figures', 'malaria', 'heatmap.png'))
+    heatmap.2(
+        diffGenes, 
+        Rowv=as.dendrogram(clustRows), 
+        Colv=as.dendrogram(clustColumns),
+        RowSideColors=module.color,
+        col=myheatcolors, scale='row', labRow=NA,
+        density.info="none", trace="none",  
+        cexRow=1, cexCol=1
+        # margins=c(8,20)
+    )
+    dev.off()
 }
 
 
