@@ -243,3 +243,10 @@ fig <- ggplot(mydata.df) +
   theme_bw()
 
 ggplotly(fig)
+
+
+
+end_time = Sys.time()
+log_print(paste('Script ended at:', Sys.time()))
+log_print(paste("Script completed in:", difftime(end_time, start_time)))
+log_close()
