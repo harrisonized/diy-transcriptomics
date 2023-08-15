@@ -25,6 +25,7 @@ install.packages("webshot2")
 install.packages('DT')
 install.packages("tidyverse")
 install.packages("plotly")
+install.packages('textshape')
 ```
 
 Installing the RNAseq conda environment:
@@ -64,7 +65,7 @@ Note: Kallisto is also the name of a package from AstraZeneca used to calculate 
 
 ## Scripts
 
-To be run in order:
+Listed in chronological order:
 
 | Step | Script | Source | Description |
 | :--- | ------ | ------ | ----------- |
@@ -72,7 +73,7 @@ To be run in order:
 | 2 | bash/map\_reads.sh | Lab 2 | Use Kallisto to map reads to the index file on leishmania dataset |
 | 3 | bash/estimate\_sequence\_similarity.sh | Lab 5 | Use Sourmash to identify non-human reads. Use Centrifuge to search for gene signatures. |
 | 4 | R/leishmania_annotate\_gene\_expression.R | Lab 4 | Use the ferret genome to annotate the leishmania dataset |
-| 5 | schistosoma_eda.R | Lab 6 | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | schistosoma_pca.R | Lab 6 | Performs PCA, then there are examples from gt, DT, and plotly. |
-| 8 | lemis_eda.R | Lab 7 | EDA on the lemis dataset. |
-| 9 | Rscript R/malaria_eda.R | Lab 9 | EDA on the malaria dataset. |
-
+| 5 | R/schistosoma_eda.R | Lab 6 | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | R/schistosoma_pca.R | Lab 6 | Performs PCA, then there are examples from gt, DT, and plotly. |
+| 8 | R/lemis_eda.R | Lab 7 | EDA on the lemis dataset. |
+| 9 | R/malaria_eda.R | Lab 9 | EDA on the malaria dataset. Placeholder for now. |
+| 10 | R/covid19_eda.R | Lab 10 | EDA on the covid19 dataset. Placeholder for now. |
