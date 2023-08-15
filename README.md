@@ -74,5 +74,5 @@ To be run in order:
 | 4 | R/leishmania_annotate\_gene\_expression.R | Lab 4 | Use the ferret genome to annotate the leishmania dataset |
 | 5 | schistosoma_eda.R | Lab 6 | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | schistosoma_pca.R | Lab 6 | Performs PCA, then there are examples from gt, DT, and plotly. |
 | 8 | lemis_eda.R | Lab 7 | EDA on the lemis dataset. |
-| 9 | Rscript R/lab_9-malaria.R | Lab 9 ||
+| 9 | Rscript R/malaria_eda.R | Lab 9 | EDA on the malaria dataset. |
 

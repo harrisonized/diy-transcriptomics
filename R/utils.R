@@ -3,6 +3,7 @@
 # Functions
 # # list_files
 # # filter_list_for_match
+# # join_many_csv
 
 
 # list all files in a directory
@@ -24,4 +25,34 @@ filter_list_for_match <- function(items, pattern) {
         items <- lapply(items, grep, pattern=pattern[[i]], value=TRUE)
     }
     return (unlist(items[!sapply(items, identical, character(0))]))  # remove character(0)
+}
+
+
+join_many_csv <- function(filepaths, index_cols, value_cols, ext='csv', recursive=TRUE, sep=',') {
+    filenames = c(tools::file_path_sans_ext(basename(dirname(paths))))  # get the foldername
+
+    
+    # read dfs and left join on index_cols
+    df_list <- lapply(filepaths, read.csv, sep=sep)
+
+    # Warning: column names ‘count.x’, ‘count.y’ are duplicated in the result
+    # See: https://stackoverflow.com/questions/38603668/suppress-any-emission-of-a-particular-warning-message
+    withCallingHandlers({
+        all_reads <- Reduce(
+            function(...) merge(..., by=index_cols),
+            lapply(df_list, "[", c(index_cols, value_cols))
+        )
+    }, warning = function(w) {
+        # print(conditionMessage(w))
+        if (startsWith(conditionMessage(w), "column names")) {
+            invokeRestart( "muffleWarning" )
+        }
+    })
+    
+    # rename columns
+    colnames(all_reads) = c(
+        index_cols,  # index_cols
+        as.list(outer(value_cols, filenames, paste, sep='-'))  # suffix value_cols with filename
+    )
+    return(all_reads)
 }
