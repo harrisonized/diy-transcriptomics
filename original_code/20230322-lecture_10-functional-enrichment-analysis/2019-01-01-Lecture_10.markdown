@@ -1,0 +1,82 @@
+---
+title: 'Functional enrichment analysis'
+subtitle: 'Lecture 10 • watch by March 22, 2023'
+date: 2019-01-01 00:00:00
+description: Now that you've identified differentially expressed genes, what do they mean and how do you begin to elucidate the biological pathways governed by these genes?  To address this question, in this class you'll learn how to carry out functional enichment analyses using Gene Ontology and Gene Set Enrichment methods.  You'll also explore different options for how to present your functional enrichment results.
+featured_image: '/images/connections.png'
+---
+
+<div style="text-align: right"> Image credit: 'Connections' by Marsha Glickman </div>
+
+[Lecture slides on iCloud](https://www.icloud.com/keynote/0BZHga2jyY55zsyEaaFbFMfjA#Lecture11%5FfunctionalEnrichment)
+
+
+## Overview
+
+Now that you've identified differentially expressed genes, what do they mean and how do you begin to elucidate the biological pathways governed by these genes?  Toward this end, you will learn how to carry out functional enichment analyses using [Gene Ontology](http://geneontology.org/) and [Gene Set Enrichment Analysis (GSEA)](http://software.broadinstitute.org/gsea/index.jsp).  We'll also explore different options for how to present your functional enrichment results graphically.
+
+## Learning objectives
+
+* Carry out Gene Ontology (GO) enrichment analysis using modules identified in the previous script
+* Carry out a Gene Set Enrichment Analysis (GSEA) using our full dataset
+* Understand the differences between GO and GSEA
+* Understand the MSigDB resource and how to access signature collections
+
+## Code
+
+[Step 7 script](http://DIYtranscriptomics.github.io/Code/files/Step7_functionalEnrichment.R)
+
+---
+
+## Lecture videos
+
+### Part 1 - Introduction to enrichment analysis methods
+
+<iframe src="https://player.vimeo.com/video/421643144" width="640" height="268" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
+### Part 2 - GO enrichment using gprofiler and our modules
+
+<iframe src="https://player.vimeo.com/video/421669877" width="640" height="268" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
+### Part 3 - Carrying GSEA and plotting the results in R
+
+<iframe src="https://player.vimeo.com/video/421684919" width="640" height="268" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
+### Part 4 - Competitive vs self-contained GSEA, and exploring gene set variation analysis (GSVA)
+
+<iframe src="https://player.vimeo.com/video/421752542" width="640" height="268" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
+---
+
+## Reading
+
+[The what, where, how and why of gene ontology -- a primer for bioinformaticians.](http://DIYtranscriptomics.github.io/Reading/files/GO.pdf)  Briefings in Bioinformatics, Feb 2011
+
+[A nice lab post on the hypergeometric test and Fisher's exact test](http://mengnote.labspot.com/2012/12/calculate-correct-hypergeometric-p.html) - these statistical tests are at the core of many functional enrichment approaches.
+
+[Analyzing gene expression data in terms of gene sets: methodological issues](https://doi.org/10.1093/bioinformatics/btm051) - A seminal paper on the statistics of enrichment analysis in gene expression studies.
+
+[Toward a gold standard for benchmarking gene set enrichment analysis](https://doi.org/10.1093/bib/bbz158) - A excellent and recent benchmarking study for enrichment tools
+
+[original 2003 Nat. Methods paper describing Gene Set Enrichment Analysis (GSEA)](http://DIYtranscriptomics.github.io/Reading/files/Mootha2003_GSEA.pdf), and the [2005 PNAS paper](http://mootha.med.harvard.edu/PubPDFs/Subramanian2005.pdf) that formally detailed its usage.
+
+You can carry out self-contained and competitive GSEA in R using [ROAST](http://DIYtranscriptomics.github.io/Reading/files/ROAST.pdf) and [CAMERA](http://DIYtranscriptomics.github.io/Reading/files/CAMERA.pdf), respectively.
+
+[Gene Set VARIATION Analysis (GSVA)](http://DIYtranscriptomics.github.io/Reading/files/GSVA.pdf) -  I find GSVA useful for producing GSEA-type results across a heterogeneous dataset (like a large cohort of patients).
+
+[The Molecular Signatures Database (MSigDB)](http://software.broadinstitute.org/gsea/msigdb)
+
+[2016 Immunity Paper describing the creation of Immunological Signatures' collection (C7)](http://DIYtranscriptomics.github.io/Reading/files/ImmuneSigDB.pdf).
+
+You know how I feel about Venn diagrams, so if you're interested in exploring interactions between many groups of genes, have a look at [this Nature Methods paper](http://DIYtranscriptomics.github.io/Reading/files/upSet_plot.pdf), the accompanying R package, [UpSetR](https://cran.r-project.org/web/packages/UpSetR/README.html), as well as the [UpSet website](http://caleydo.org/tools/upset/).  Note, there's a shiny app for this as well!
+
+
+---
+
+## Other videos
+
+### A quick StatQuest on the Fisher's exact test and its application to gene enrichment testing
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/udyAvvaMjfM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
