@@ -67,13 +67,14 @@ Note: Kallisto is also the name of a package from AstraZeneca used to calculate 
 
 Listed in chronological order:
 
-| Step | Script | Source | Description |
+| Item | Source | Script Name | Description |
 | :--- | ------ | ------ | ----------- |
-| 1 | bash/build\_kallisto\_index.sh | Lecture 2 | Use Kallisto to build an index on leishmania dataset |
-| 2 | bash/map\_reads.sh | Lab 2 | Use Kallisto to map reads to the index file on leishmania dataset |
-| 3 | bash/estimate\_sequence\_similarity.sh | Lab 5 | Use Sourmash to identify non-human reads. Use Centrifuge to search for gene signatures. |
-| 4 | R/leishmania_annotate\_gene\_expression.R | Lab 4 | Use the ferret genome to annotate the leishmania dataset |
-| 5 | R/schistosoma_eda.R | Lab 6 | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | R/schistosoma_pca.R | Lab 6 | Performs PCA, then there are examples from gt, DT, and plotly. |
-| 8 | R/lemis_eda.R | Lab 7 | EDA on the lemis dataset. |
-| 9 | R/malaria_eda.R | Lab 9 | EDA on the malaria dataset. Placeholder for now. |
-| 10 | R/covid19_eda.R | Lab 10 | EDA on the covid19 dataset. Placeholder for now. |
+| 1 | Lecture 2 | bash/build\_kallisto\_index.sh  | Use Kallisto to build an index on leishmania dataset |
+| 2 | Lab 2 | bash/map\_reads.sh | Use Kallisto to map reads to the index file on leishmania dataset |
+| 3 | Lab 5 | bash/estimate\_sequence\_similarity.sh | Use Sourmash to identify non-human reads. Use Centrifuge to search for gene signatures. |
+| 4 | Lab 4 | R/leishmania_annotate\_gene\_expression.R | Use the ferret genome to annotate the leishmania dataset |
+| 5 | Lab 6 | R/schistosoma_eda.R | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | Lab 6 | R/schistosoma_pca.R | Performs PCA, then there are examples from gt, DT, and plotly. |
+| 8 | Lab 7 | R/lemis_eda.R | EDA on the lemis dataset. |
+| 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. Placeholder for now. |
+| 10 | Lab 10 | R/covid19_eda.R | EDA on the covid19 dataset. Placeholder for now. |
+| 10 | Lab 13 | R/covid19_scrnaseq.R | scRNAseq analysis on covid19_scrnaseq dataset. Placeholder for now. |
