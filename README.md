@@ -18,6 +18,8 @@ BiocManager::install("EnsDb.Hsapiens.v86")
 BiocManager::install("BSgenome.Mfuro.UCSC.musFur1")  # Mustela putorius furo
 # BiocManager::install("biomaRt")  # already installed
 BiocManager::install("edgeR")
+BiocManager::install("DropletUtils")
+
 install.packages('hexbin')
 install.packages('cowplot')
 install.packages('gt')
@@ -26,6 +28,7 @@ install.packages('DT')
 install.packages("tidyverse")
 install.packages("plotly")
 install.packages('textshape')
+install.packages('R2HTML')
 ```
 
 Installing the RNAseq conda environment:
