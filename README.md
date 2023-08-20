@@ -19,6 +19,7 @@ BiocManager::install("BSgenome.Mfuro.UCSC.musFur1")  # Mustela putorius furo
 # BiocManager::install("biomaRt")  # already installed
 BiocManager::install("edgeR")
 BiocManager::install("DropletUtils")
+BiocManager::install("scran")  # installed with cellassign
 
 install.packages('hexbin')
 install.packages('cowplot')
@@ -29,6 +30,14 @@ install.packages("tidyverse")
 install.packages("plotly")
 install.packages('textshape')
 install.packages('R2HTML')
+install.packages("tensorflow")
+tensorflow::install_tensorflow()  # do not install miniconda
+
+devtools::install_github("Irrationone/cellassign")  # install tensorflow first
+brew install gcc
+
+devtools::install_github("hhcho/densvis")
+# BiocManager::install("scater")  # dependency ‘densvis’ is not available for package ‘scater’
 ```
 
 Installing the RNAseq conda environment:
@@ -80,5 +89,6 @@ Listed in chronological order:
 | 8 | Lab 7 | R/lemis_eda.R | EDA on the lemis dataset. |
 | 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
 | 10 | Lab 9 | R/malaria_pca.R | EDA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
-| 11 | Lab 10 | R/covid19_eda.R | EDA on the covid19 dataset. Placeholder for now. |
-| 12 | Lab 13 | R/covid19_scrnaseq.R | scRNAseq analysis on covid19_scrnaseq dataset. Placeholder for now. |
+| 11 | Lab 10 | R/covid19\_eda.R | EDA on the covid19 dataset. This is supposed to proceed similarly as the schistosoma and malaria datasets, but I'm going to keep this just as a placeholder. |
+| 12 | Lab 13 | R/covid19\_scrnaseq\_clustering | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
+| 13 | Lab 13 | R/covid19\_scrnaseq\_integrate | scRNAseq analysis on covid19_scrnaseq dataset. Works on the Seurat object. Placeholder for now. |
