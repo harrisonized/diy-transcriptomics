@@ -7,7 +7,9 @@ This is where I followed along this RNA-seq data analysis course.
 
 ## Installation
 
-1. Install Miniconda3 from  [here](https://docs.conda.io/en/latest/miniconda.html). I downloaded the `Miniconda3-latest-MacOSX-arm64.sh` and used `chmod +x` to make it exectuable. See: [https://protocols.hostmicrobe.org/conda](https://protocols.hostmicrobe.org/conda). Afterward, create the `rnaseq` conda environment.
+1. Install Miniconda3 from  [here](https://docs.conda.io/en/latest/miniconda.html). I downloaded the `Miniconda3-latest-MacOSX-arm64.sh` and used `chmod +x` to make it exectuable. See: [https://protocols.hostmicrobe.org/conda](https://protocols.hostmicrobe.org/conda).
+
+	In general, because trying to resolve issues with the base environment are challenging and can potentially destroy your entire conda installation, it is best practice to never use the base environment for anything and to only ever work in isolated environments. Therefore, create the `rnaseq` conda environment.
 	
 	```bash
 	conda create --name rnaseq
@@ -15,18 +17,29 @@ This is where I followed along this RNA-seq data analysis course.
 	conda config --add channels bioconda
 	conda install pip
 	
+	# packages
+	pip install multiqc
+	conda install fastqc
+	pip install sourmash
+	```
+	
+2. Install Kallisto. On the Apple M1 Pro, you will need homebrew.
+
+	```
 	# install brew and add to $PATH
 	git clone https://github.com/Homebrew/brew homebrew
 	eval "$(homebrew/bin/brew shellenv)"
 	brew update --force --quiet
 	export PATH="/Users/wanghc/homebrew/bin:$PATH"
 	
-	# packages
-	pip install multiqc
 	brew install kallisto  # Careful! See below.
-	conda install fastqc
-	pip install sourmash
+	```
 	
+	Note that this installation is completely separate from conda. If you use use `pip install kallisto`, you will instead get a package from AstraZeneca with the same name, which is used to calculate atomic features. This is not what we want.
+	
+3. Install Centrifuge. On the Apple M1 Pro, you will need Rosetta 2 to make this work.
+
+	```
 	# install Rosetta 2
 	/usr/sbin/softwareupdate --install-rosetta --agree-to-license
 	
@@ -36,9 +49,7 @@ This is where I followed along this RNA-seq data analysis course.
 	export PATH="$HOME/centrifuge-1.0.3-beta:$PATH
 	```
 	
-	Note: Running `pip install kallisto` will result in installing the wrong package with the same name, because Kallisto is also the name of a package from AstraZeneca used to calculate atomic features.
-
-2. Install the following packages in R:
+4. Install the following packages in R:
 
 	```R
 	# regular packages
@@ -67,11 +78,12 @@ This is where I followed along this RNA-seq data analysis course.
 	BiocManager::install('celldex')
 	
 	# difficult-to-install packages
-	BiocManager::install("densvis")  # ERROR: compilation failed for package ‘densvis’
-	BiocManager::install("scater")  # ERROR: dependency ‘densvis’ is not available for package ‘scater’
+	# try this later
+	# BiocManager::install("densvis")  # ERROR: compilation failed for package ‘densvis’
+	# BiocManager::install("scater")  # ERROR: dependency ‘densvis’ is not available for package ‘scater’
 	```
 
-3. Install Tensorflow and CellAssign.
+5. Install Tensorflow and CellAssign.
 
 	Please make sure you read this entire section before you begin.
 	
@@ -84,7 +96,7 @@ This is where I followed along this RNA-seq data analysis course.
 	  error: Tensorflow installation not detected. Please run 'tensorflow::install_tensorflow()' to continue...
 	```
 	
-	In general, because trying to resolve issues with the base environment are challenging and can potentially destroy your entire conda installation, it is recommended that you only work in isolated environments. Therefore, I recommend creating the `r-reticulate` environment. The name comes from the default environment R will create for you if cellassign can't find Tensorflow. Run the following command in your terminal:
+	Because it is best practice not to work in the base environment, I recommend creating the `r-reticulate` environment. The name comes from the default environment R will create for you if cellassign can't find Tensorflow. Run the following command in your terminal:
 	
 	```bash
 	conda create --name r-reticulate python=3.10
@@ -106,7 +118,7 @@ This is where I followed along this RNA-seq data analysis course.
 	    Found conflicts!
 	```
 	
-	If you are an advanced user, you can try to reset your base environment by running the following command: `conda install --revision=0`, but I can't guarantee this will resolve the issue.
+	If you are an advanced user, you can always try to reset your base environment by running the following command: `conda install --revision=0`, but I can't guarantee this will resolve the issue.
 	
 	Suppose you started to install tensorflow and then you realized that it was installing into the wrong environment. Unfortunately, you cannot switch halfway in between. R will give you the following error:
 	
