@@ -123,9 +123,10 @@ This is where I followed along this RNA-seq data analysis course.
 	Suppose you started to install tensorflow and then you realized that it was installing into the wrong environment. Unfortunately, you cannot switch halfway in between. R will give you the following error:
 	
 	```
-	ERROR: The requested version of Python (`~/miniconda3/envs/r-reticulate/bin/python') cannot beused, as another version of Python('~/miniconda/bin/python') has already been initialized.
-   ```
-   
+	ERROR: The requested version of Python ('~/miniconda3/envs/r-reticulate/bin/python') cannot be used,
+	as another version of Python ('~/miniconda/bin/python') has already been initialized.
+	```	
+	
 	If you get this, simply restart R, and make sure you point reticulate to the correct environment.
 	
 	When I was trying to resolve conflicts while installing Tensorflow on my Apple M1 Pro, I messed up in a dramatic way and accidentally destroyed my base environment! Specifically, I ran `pip uninstall -y -r <(pip freeze)` after reading [this StackOverflow post](https://stackoverflow.com/questions/41914139/how-to-reset-anaconda-root-environment), which left my conda base environment in an inconsistent, irrcoverable state. Afterward, I ended up having to do a clean install. When you do a clean install, it is possible to save your existing environments by moving the `miniconda3/envs` folder somewhere else. Then, after reinstalling conda, move that folder back. (Unfortunately, I forgot to do this too.) Please make sure you do not repeat these mistakes!
