@@ -110,6 +110,19 @@ This is where I followed along this RNA-seq data analysis course.
 	tensorflow::install_tensorflow(extra_packages='tensorflow-probability')
 	devtools::install_github("Irrationone/cellassign", force=TRUE)
 	```
+	
+	Finally, in your terminal, run the following:
+	
+	```bash
+	conda activate r-reticulate
+	conda install -c conda-forge tensorflow-probability=0.20.0
+	```
+	If tensorflow-probability is the wrong version, you will encounter the following error message:
+	
+	```
+	Error in py_module_import(module, convert = convert) :   AttributeError: module 'tensorflow.python.framework.type_spec' has no attribute '_NAME_TO_TYPE_SPEC'
+	```
+	
 	Note that if you start to install tensorflow without first running `reticulate::use_condaenv('r-reticulate')`, tensorflow will be installed in your base environment, which is NOT what you want. The reason is that you can potentially run into the following issue, and then you'll have to create a new environment anyway.
 	
 	```
