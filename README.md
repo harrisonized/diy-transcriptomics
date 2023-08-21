@@ -7,79 +7,123 @@ This is where I followed along this RNA-seq data analysis course.
 
 ## Installation
 
-Install the following R packages:
+1. Install Miniconda3 from  [here](https://docs.conda.io/en/latest/miniconda.html). I downloaded the `Miniconda3-latest-MacOSX-arm64.sh` and used `chmod +x` to make it exectuable. See: [https://protocols.hostmicrobe.org/conda](https://protocols.hostmicrobe.org/conda). Afterward, create the `rnaseq` conda environment.
+	
+	```bash
+	conda create --name rnaseq
+	conda activate rnaseq
+	conda config --add channels bioconda
+	conda install pip
+	
+	# install brew and add to $PATH
+	git clone https://github.com/Homebrew/brew homebrew
+	eval "$(homebrew/bin/brew shellenv)"
+	brew update --force --quiet
+	export PATH="/Users/wanghc/homebrew/bin:$PATH"
+	
+	# packages
+	pip install multiqc
+	brew install kallisto  # Careful! See below.
+	conda install fastqc
+	pip install sourmash
+	
+	# install Rosetta 2
+	/usr/sbin/softwareupdate --install-rosetta --agree-to-license
+	
+	# Download Centrifuge from here: http://www.ccb.jhu.edu/software/centrifuge/index.shtml
+	# Releases > Mac OS X x86_64 binary
+	# Add this to .zshrc:
+	export PATH="$HOME/centrifuge-1.0.3-beta:$PATH
+	```
+	
+	Note: Running `pip install kallisto` will result in installing the wrong package with the same name, because Kallisto is also the name of a package from AstraZeneca used to calculate atomic features.
 
-```R
-BiocManager::install("rhdf5")
-BiocManager::install("tximport")
-BiocManager::install("ensembldb")
-BiocManager::install("beepr")
-BiocManager::install("EnsDb.Hsapiens.v86")
-BiocManager::install("BSgenome.Mfuro.UCSC.musFur1")  # Mustela putorius furo
-# BiocManager::install("biomaRt")  # already installed
-BiocManager::install("edgeR")
-BiocManager::install("DropletUtils")
-BiocManager::install("scran")  # installed with cellassign
+2. Install the following packages in R:
 
-install.packages('hexbin')
-install.packages('cowplot')
-install.packages('gt')
-install.packages("webshot2")
-install.packages('DT')
-install.packages("tidyverse")
-install.packages("plotly")
-install.packages('textshape')
-install.packages('R2HTML')
-install.packages("tensorflow")
-tensorflow::install_tensorflow()  # do not install miniconda
+	```R
+	# regular packages
+	install.packages('hexbin')
+	install.packages('cowplot')
+	install.packages('gt')
+	install.packages("webshot2")
+	install.packages('DT')
+	install.packages("tidyverse")
+	install.packages("plotly")
+	install.packages('textshape')
+	install.packages('R2HTML')
+	
+	# biology-focused packages
+	BiocManager::install("rhdf5")
+	BiocManager::install("tximport")
+	BiocManager::install("ensembldb")
+	BiocManager::install("beepr")
+	BiocManager::install("EnsDb.Hsapiens.v86")
+	BiocManager::install("BSgenome.Mfuro.UCSC.musFur1")  # Mustela putorius furo
+	# BiocManager::install("biomaRt")  # already installed
+	BiocManager::install("edgeR")
+	BiocManager::install("DropletUtils")
+	BiocManager::install("scran")
+	BiocManager::install("SingleR")
+	BiocManager::install('celldex')
+	
+	# difficult-to-install packages
+	BiocManager::install("densvis")  # ERROR: compilation failed for package ‘densvis’
+	BiocManager::install("scater")  # ERROR: dependency ‘densvis’ is not available for package ‘scater’
+	```
 
-devtools::install_github("Irrationone/cellassign")  # install tensorflow first
-brew install gcc
+3. Install Tensorflow and CellAssign.
 
-devtools::install_github("hhcho/densvis")
-# BiocManager::install("scater")  # dependency ‘densvis’ is not available for package ‘scater’
-```
-
-Installing the RNAseq conda environment:
-See: [https://protocols.hostmicrobe.org/conda](https://protocols.hostmicrobe.org/conda)
-
-```bash
-conda create --name rnaseq
-conda activate rnaseq
-conda config --add channels bioconda
-conda install pip
-
-# install brew and add to $PATH
-git clone https://github.com/Homebrew/brew homebrew
-eval "$(homebrew/bin/brew shellenv)"
-brew update --force --quiet
-export PATH="/Users/wanghc/homebrew/bin:$PATH"
-
-# packages
-pip install multiqc
-brew install kallisto
-conda install fastqc
-pip install sourmash
-
-# install Rosetta 2
-/usr/sbin/softwareupdate --install-rosetta --agree-to-license
-
-# Download Centrifuge from here: http://www.ccb.jhu.edu/software/centrifuge/index.shtml
-# Releases > Mac OS X x86_64 binary
-# Add this to .zshrc:
-export PATH="$HOME/centrifuge-1.0.3-beta:$PATH
-
-
-```
-
-Note: Kallisto is also the name of a package from AstraZeneca used to calculate atomic features, which is what you will get if you run `pip install kallisto`, and it is the wrong package to install.
+	Please make sure you read this entire section before you begin.
+	
+	In R, the `reticulate` package is used to allow R to access python through conda. By default, it will look for python at `/usr/bin/python3` or `~/miniconda3/bin/python` (your base environment), and then it will be extremely confusing when you run `library('cellassign')` and you get the following error, even though you swear you installed it:
+	
+	```
+	Error: package or namespace load failed for ‘cellassign’:
+	  .onLoad failed in loadNamespace() for 'cellassign', details:
+	  call: fun(libname, pkgname)
+	  error: Tensorflow installation not detected. Please run 'tensorflow::install_tensorflow()' to continue...
+	```
+	
+	In general, because trying to resolve issues with the base environment are challenging and can potentially destroy your entire conda installation, it is recommended that you only work in isolated environments. Therefore, I recommend creating the `r-reticulate` environment. The name comes from the default environment R will create for you if cellassign can't find Tensorflow. Run the following command in your terminal:
+	
+	```bash
+	conda create --name r-reticulate python=3.10
+	```
+	
+	Then, in RStudio, run the following:
+	
+	```R
+	install.packages("tensorflow")
+	reticulate::use_condaenv('r-reticulate')  # IMPORTANT!
+	tensorflow::install_tensorflow(extra_packages='tensorflow-probability')
+	devtools::install_github("Irrationone/cellassign", force=TRUE)
+	```
+	Note that if you start to install tensorflow without first running `reticulate::use_condaenv('r-reticulate')`, tensorflow will be installed in your base environment, which is NOT what you want. The reason is that you can potentially run into the following issue, and then you'll have to create a new environment anyway.
+	
+	```
+	Solving environment: failed with initial frozen solve. Retrying with flexible solve.
+	    Solving environment: / 
+	    Found conflicts!
+	```
+	
+	If you are an advanced user, you can try to reset your base environment by running the following command: `conda install --revision=0`, but I can't guarantee this will resolve the issue.
+	
+	Suppose you started to install tensorflow and then you realized that it was installing into the wrong environment. Unfortunately, you cannot switch halfway in between. R will give you the following error:
+	
+	```
+	ERROR: The requested version of Python (`~/miniconda3/envs/r-reticulate/bin/python') cannot beused, as another version of Python('~/miniconda/bin/python') has already been initialized.
+   ```
+   
+	If you get this, simply restart R, and make sure you point reticulate to the correct environment.
+	
+	When I was trying to resolve conflicts while installing Tensorflow on my Apple M1 Pro, I messed up in a dramatic way and accidentally destroyed my base environment! Specifically, I ran `pip uninstall -y -r <(pip freeze)` after reading [this StackOverflow post](https://stackoverflow.com/questions/41914139/how-to-reset-anaconda-root-environment), which left my conda base environment in an inconsistent, irrcoverable state. Afterward, I ended up having to do a clean install. When you do a clean install, it is possible to save your existing environments by moving the `miniconda3/envs` folder somewhere else. Then, after reinstalling conda, move that folder back. (Unfortunately, I forgot to do this too.) Please make sure you do not repeat these mistakes!
 
 
 ## Scripts
 
 Listed in chronological order:
 
-| Item | Source | Script Name | Description |
+| Script Number | Source | Script Name | Description |
 | :--- | ------ | ------ | ----------- |
 | 1 | Lecture 2 | bash/build\_kallisto\_index.sh  | Use Kallisto to build an index on leishmania dataset |
 | 2 | Lab 2 | bash/map\_reads.sh | Use Kallisto to map reads to the index file on leishmania dataset |
