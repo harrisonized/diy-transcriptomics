@@ -115,13 +115,19 @@ This is where I followed along this RNA-seq data analysis course.
 	
 	```bash
 	conda activate r-reticulate
-	conda install -c conda-forge tensorflow-probability=0.20.0
+	conda install -c conda-forge tensorflow-probability=0.19.0  # keras=2.11.0
 	```
-	If tensorflow-probability is the wrong version, you will encounter the following error message:
+	If your tensorflow-probability version is too low (eg. 0.14.0), you will encounter the following error message:
 	
 	```
 	Error in py_module_import(module, convert = convert) : 
 	AttributeError: module 'tensorflow.python.framework.type_spec' has no attribute '_NAME_TO_TYPE_SPEC'
+	```
+	
+	If your tensorflow-probability vsion nis too high (eg. 0.20.0), you will encounter the following error message:
+	
+	```
+	"ImportError: cannot import name 'deserialize_keras_object' from partially initialized module 'keras."
 	```
 	
 	Note that if you start to install tensorflow without first running `reticulate::use_condaenv('r-reticulate')`, tensorflow will be installed in your base environment, which is NOT what you want. The reason is that you can potentially run into the following issue, and then you'll have to create a new environment anyway.
