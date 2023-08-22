@@ -85,7 +85,7 @@ This is where I followed along this RNA-seq data analysis course.
 
 5. Install Tensorflow and CellAssign.
 
-	Please make sure you read this entire section before you begin.
+	Please make sure you read section 7 on troubleshooting before you begin.
 	
 	In R, the `reticulate` package is used to allow R to access python through conda. By default, it will look for python at `/usr/bin/python3` or `~/miniconda3/bin/python` (your base environment), and then it will be extremely confusing when you run `library('cellassign')` and you get the following error, even though you swear you installed it:
 	
@@ -96,10 +96,10 @@ This is where I followed along this RNA-seq data analysis course.
 	  error: Tensorflow installation not detected. Please run 'tensorflow::install_tensorflow()' to continue...
 	```
 	
-	Because it is best practice not to work in the base environment, I recommend creating the `r-reticulate` environment. The name comes from the default environment R will create for you if cellassign can't find Tensorflow. Run the following command in your terminal:
+	Because it is best practice not to work in the base environment, I recommend creating the `r-reticulate` environment. The name comes from the default environment R will create for you if cellassign can't find Tensorflow. Run the following commands in your terminal:
 	
 	```bash
-	conda create --name r-reticulate python=3.10
+	conda create --name r-reticulate python=3.9
 	```
 	
 	Then, in RStudio, run the following:
@@ -107,7 +107,7 @@ This is where I followed along this RNA-seq data analysis course.
 	```R
 	install.packages("tensorflow")
 	reticulate::use_condaenv('r-reticulate')  # IMPORTANT!
-	tensorflow::install_tensorflow(extra_packages='tensorflow-probability')
+	tensorflow::install_tensorflow(extra_packages='tensorflow-probability', version = "2.1.0")  # Only `version = 'default'` supported on Arm Macs at this time. Request for Tensorflow version '2.1.0' ignored.
 	devtools::install_github("Irrationone/cellassign", force=TRUE)
 	```
 	
@@ -115,8 +115,37 @@ This is where I followed along this RNA-seq data analysis course.
 	
 	```bash
 	conda activate r-reticulate
-	conda install -c conda-forge tensorflow-probability=0.19.0  # keras=2.11.0
+	
+	# fix the import error
+	pip uninstall tensorflow-metal
+
+	# AttributeError: module 'tensorflow.python.framework.type_spec' has no attribute '_NAME_TO_TYPE_SPEC'
+	conda install -c conda-forge tensorflow-probability=0.19.0
+	pip uninstall keras  # pip's keras superceded conda's keras
+	
+	# All of these result in different errors, see Section 6
+	pip install keras==2.13.1  # current version
+	# pip install keras==2.11.0
+	# pip install keras==2.4.3
 	```
+	
+	Check that it installed properly:
+	
+	```
+	reticulate::use_condaenv('r-reticulate')
+	reticulate::import("tensorflow")
+	reticulate::import("tensorflow_probability")
+	reticulate::py_discover_config("keras")
+	```
+	
+6. Package versions:
+
+	If your tensorflow-probability version is too high (eg. 0.20.0), you will encounter the following error message:
+	
+	```
+	"ImportError: cannot import name 'deserialize_keras_object' from partially initialized module 'keras."
+	```
+	
 	If your tensorflow-probability version is too low (eg. 0.14.0), you will encounter the following error message:
 	
 	```
@@ -124,13 +153,38 @@ This is where I followed along this RNA-seq data analysis course.
 	AttributeError: module 'tensorflow.python.framework.type_spec' has no attribute '_NAME_TO_TYPE_SPEC'
 	```
 	
-	If your tensorflow-probability vsion nis too high (eg. 0.20.0), you will encounter the following error message:
+	If keras is not installed or detected, you will see the following error:
 	
 	```
-	"ImportError: cannot import name 'deserialize_keras_object' from partially initialized module 'keras."
+	Error in py_module_import(module, convert = convert) : 
+	AttributeError: module 'keras.api._v2.keras' has no attribute 'layers'
+	```
+
+    If your keras version is too high (2.13.1), then you will see the following error:
+	
+	```
+	Error in py_module_import(module, convert = convert):
+	AttributeError: module 'tensorflow.python.data.ops.from_tensor_slices_op' has no attribute '_TensorSliceDataset'
 	```
 	
-	Note that if you start to install tensorflow without first running `reticulate::use_condaenv('r-reticulate')`, tensorflow will be installed in your base environment, which is NOT what you want. The reason is that you can potentially run into the following issue, and then you'll have to create a new environment anyway.
+	If you have a version of keras that is mid-range (2.11.0, 2.12.0), then you will see the following error:
+	
+	```
+	ValueError: Tried to convert 'shape' to a tensor and failed.
+	Error: Cannot convert a partially known TensorShape (1, ?) to a Tensor.
+	```
+	
+	If you have a low version of keras (<=2.4.3), you will see the following error:
+	
+	```
+	ImportError: Keras requires TensorFlow 2.2 or higher. Install TensorFlow via `pip install tensorflow`
+	```
+	
+	So far I have not found a version of Keras that resolves this issue, so unfortunately, at this current time, it is impossible for me to run `cellassign` on my local machine.
+	
+7. Advanced troubleshooting:
+	
+	If you start to install tensorflow without first running `reticulate::use_condaenv('r-reticulate')`, tensorflow will be installed in your base environment, which is NOT what you want. The reason is that you can potentially run into the following issue, and then you'll have to create a new environment anyway.
 	
 	```
 	Solving environment: failed with initial frozen solve. Retrying with flexible solve.
