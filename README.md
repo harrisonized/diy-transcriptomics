@@ -84,8 +84,6 @@ This is where I followed along this RNA-seq data analysis course.
 	```
 
 5. Install Tensorflow and CellAssign.
-
-	Please make sure you read section 7 on troubleshooting before you begin.
 	
 	In R, the `reticulate` package is used to allow R to access python through conda. By default, it will look for python at `/usr/bin/python3` or `~/miniconda3/bin/python` (your base environment), and then it will be extremely confusing when you run `library('cellassign')` and you get the following error, even though you swear you installed it:
 	
@@ -96,38 +94,43 @@ This is where I followed along this RNA-seq data analysis course.
 	  error: Tensorflow installation not detected. Please run 'tensorflow::install_tensorflow()' to continue...
 	```
 	
-	Because it is best practice not to work in the base environment, I recommend creating the `r-reticulate` environment. The name comes from the default environment R will create for you if cellassign can't find Tensorflow. Run the following commands in your terminal:
+	Because it is best practice not to work in the base environment, I recommend creating the `r-reticulate` environment. The name comes from the default environment R will create for you if cellassign can't find Tensorflow. Run the following command in your terminal:
 	
 	```bash
 	conda create --name r-reticulate python=3.9
 	```
 	
-	Then, in RStudio, run the following:
+	Next, install tensorflow using RStudio. This is because if you instead opt to install tensorflow directly using conda in the terminal, it is possible that at the end of it, R may be unable to detect your installation.
 	
 	```R
 	install.packages("tensorflow")
 	reticulate::use_condaenv('r-reticulate')  # IMPORTANT!
-	tensorflow::install_tensorflow(extra_packages='tensorflow-probability', version = "2.1.0")  # Only `version = 'default'` supported on Arm Macs at this time. Request for Tensorflow version '2.1.0' ignored.
-	devtools::install_github("Irrationone/cellassign", force=TRUE)
+	tensorflow::install_tensorflow(extra_packages='tensorflow-probability')
 	```
+	Also note that unfortunately, you cannot specify which version of tensorflow you'll get. If you try, you will get the following warning:
 	
-	Finally, in your terminal, run the following:
+	```
+	# Only `version = 'default'` supported on Arm Macs at this time.
+	Request for Tensorflow version '2.1.0' ignored.
+	```
+	When installing tensorflow through RStudio, you will be left with some inconsistencies, which will need to be cleaned up. In your terminal, run the following:
 	
 	```bash
 	conda activate r-reticulate
 	
-	# fix the import error
+	# this causes an annoying import error
 	pip uninstall tensorflow-metal
-
-	# AttributeError: module 'tensorflow.python.framework.type_spec' has no attribute '_NAME_TO_TYPE_SPEC'
-	conda install -c conda-forge tensorflow-probability=0.19.0
-	pip uninstall keras  # pip's keras superceded conda's keras
 	
-	# All of these result in different errors, see Section 6
-	pip install keras==2.13.1  # current version
-	# pip install keras==2.11.0
-	# pip install keras==2.4.3
+	# fix the inconsistencies
+	conda install -c anaconda tensorflow-base
+	conda install -c conda-forge tensorflow-probability=0.18.0
+	
+	# reinstall keras
+	pip uninstall keras
+	pip install keras==2.13.1
 	```
+	
+	On my system, this gave me tensorflow                2.13.0, tensorflow-base=2.10.0, tensorflow-deps=2.9.0,tensorflow-probability=0.18.0, and keras=2.13.1. Do NOT install tensorflow using pip via `pip install tensorflow`. This will result in an import error.
 	
 	Check that it installed properly:
 	
@@ -138,15 +141,42 @@ This is where I followed along this RNA-seq data analysis course.
 	reticulate::py_discover_config("keras")
 	```
 	
-6. Package versions:
+	When the imports work, you'll get a nice return message, eg. `Module(tensorflow)`. If Keras isn't installed properly, when you run `reticulate::py_discover_config("keras")`, you'll see `Keras: [NOT FOUND]`. If this happens to you, check that there isn't an extra pointer in your conda environment. When you run `conda list` and `pip list`, Keras should only show up on `pip list`. If it also shows up on `conda list`, especially if there's a different version, navigate to `~/miniconda3/envs/r-reticulate/lib/python3.9/site-packages` and remove the extra one. For example, for me, it was `rm -rf keras-2.9.0.dist-info`. This happens because you use both conda and pip to install it, and pip may not remove the conda pointer when overwriting the folder.
+	
+	Finally, after all that, you are ready to install `cellassign`. But not so fast! You cannot install it directly from `Irrationone/cellassign`, because doing so will cause you to run into the following error when you go to run cellassign:
+	
+	```
+	ValueError: Tried to convert 'shape' to a tensor and failed.
+	Error: Cannot convert a partially known TensorShape (1, ?) to a Tensor.
+	```
+	If you see this error, you are on the right track, because the solution is documented in [this github issue](https://github.com/Irrationone/cellassign/issues/92#issuecomment-1154355997). Following the solution, fork the repo, then edit [inference-tensorflow.R line 65](https://github.com/Irrationone/cellassign/blob/master/R/inference-tensorflow.R#L165) to be this:
+	
+	```R
+	p_y_on_c_norm <- tf$reshape(tf$reduce_logsumexp(p_y_on_c_unorm, 0L), as_tensor(shape(1,NULL)))
+	```
+	
+	Finally, install tensorflow from your forked repo:
+	
+	```R
+	devtools::install_github("your_fork/cellassign")
+	```
+	
+	Alternatively, you could save yourself some hassle by installing from my fork:
+	
+	```
+	devtools::install_github("harrison/cellassign")`
+	```
+	However, if you do this, just keep in mind that while it's generally okay to install from well-vetted git repos such as cellassign, installing repos from unknown developers such as myself is a security risk, because you never know if someone committed  malicious code that will execute when you try to run the program. Obviously, I didn't do that, but you get the point.
+	
+6. Installation errors I encountered:
 
-	If your tensorflow-probability version is too high (eg. 0.20.0), you will encounter the following error message:
+	If your tensorflow-probability version is too low (eg. 0.14.0), you will encounter the following error message:
 	
 	```
 	"ImportError: cannot import name 'deserialize_keras_object' from partially initialized module 'keras."
 	```
 	
-	If your tensorflow-probability version is too low (eg. 0.14.0), you will encounter the following error message:
+	If your tensorflow-probability version is too high (eg. 0.20.0), you will encounter the following error message:
 	
 	```
 	Error in py_module_import(module, convert = convert) : 
@@ -160,14 +190,14 @@ This is where I followed along this RNA-seq data analysis course.
 	AttributeError: module 'keras.api._v2.keras' has no attribute 'layers'
 	```
 
-    If your keras version is too high (2.13.1), then you will see the following error:
+    If your keras version is inconsistent with one of your other packages, then you will see the following error:
 	
 	```
 	Error in py_module_import(module, convert = convert):
 	AttributeError: module 'tensorflow.python.data.ops.from_tensor_slices_op' has no attribute '_TensorSliceDataset'
 	```
 	
-	If you have a version of keras that is mid-range (2.11.0, 2.12.0), then you will see the following error:
+	If you have the right version of keras (>=2.10.0), then you will see the following error:
 	
 	```
 	ValueError: Tried to convert 'shape' to a tensor and failed.
@@ -179,8 +209,6 @@ This is where I followed along this RNA-seq data analysis course.
 	```
 	ImportError: Keras requires TensorFlow 2.2 or higher. Install TensorFlow via `pip install tensorflow`
 	```
-	
-	So far I have not found a version of Keras that resolves this issue, so unfortunately, at this current time, it is impossible for me to run `cellassign` on my local machine.
 	
 7. Advanced troubleshooting:
 	
@@ -201,7 +229,7 @@ This is where I followed along this RNA-seq data analysis course.
 	as another version of Python ('~/miniconda/bin/python') has already been initialized.
 	```	
 	
-	If you get this, simply restart R, and make sure you point reticulate to the correct environment.
+	If you get this, simply restart R, and make sure you point reticulate to the correct environment upon startup.
 	
 	When I was trying to resolve conflicts while installing Tensorflow on my Apple M1 Pro, I messed up in a dramatic way and accidentally destroyed my base environment! Specifically, I ran `pip uninstall -y -r <(pip freeze)` after reading [this StackOverflow post](https://stackoverflow.com/questions/41914139/how-to-reset-anaconda-root-environment), which left my conda base environment in an inconsistent, irrcoverable state. Afterward, I ended up having to do a clean install. When you do a clean install, it is possible to save your existing environments by moving the `miniconda3/envs` folder somewhere else. Then, after reinstalling conda, move that folder back. (Unfortunately, I forgot to do this too.) Please make sure you do not repeat these mistakes!
 
