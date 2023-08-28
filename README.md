@@ -249,5 +249,8 @@ Listed in chronological order:
 | 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
 | 10 | Lab 9 | R/malaria_pca.R | EDA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
 | 11 | Lab 10 | R/covid19\_eda.R | EDA on the covid19 dataset. This is supposed to proceed similarly as the schistosoma and malaria datasets, but I'm going to keep this just as a placeholder. |
-| 12 | Lab 13 | R/covid19\_scrnaseq\_clustering | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
-| 13 | Lab 13 | R/covid19\_scrnaseq\_integrate | scRNAseq analysis on covid19_scrnaseq dataset. Works on the Seurat object. Placeholder for now. |
+| 12 | Lecture 14 | R/covid19\_scrnaseq\_clustering | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
+| 13 | Lecture 14 | R/covid19\_scrnaseq\_clustering | scRNAseq analysis on covid19_scrnaseq dataset. Does automatic cluster assignment.
+| 14 | Lecture 14 | R/toxoplasma\_data\_integration | Compares two seurat objects from the toxoplasma dataset. |
+
+The only script not explictly addressed is `Step7_functionalEnrichment.R` from Lecture 10. Also need to figure out how to install scater. All of lines requiring `scater::plotUMAP` have been hashed out.
