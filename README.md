@@ -2,12 +2,39 @@
 
 Course link: [https://diytranscriptomics.com/](https://diytranscriptomics.com/)
 
-This is where I followed along this RNA-seq data analysis course.
+This is where I followed along Daniel Beiting's RNA-seq data analysis course. In my opinion, this was a good introductory course for getting started with using some of the basic libraries and functions to analyze some simple bioinformatics datasets, especially if you have no previous coding experience. I liked that all the scripts were designed to be able to run locally, which makes it easy to really examine the objects in RStudio and figure out how the code works.
 
+However, during the course, I personally found it difficult to follow along, because the provided example scripts contained many antipatterns, such as:
 
-## Installation
+1. code duplication
+2. hard-coding: paths, data, column names, etc.
+3. missing references: some lines reference objects instantiated in previous scripts, requiring you to save all your RData when you close RStudio. If for some reason you clear that, it becomes very challenging to get that back
+4. lack of modularity: data and figures are all input and output into the same directory, making it difficult to figure out which files are required
+5. manual intervention required: instead of using `ggsave()` or `png() plot() dev.off()`, the script expects you to run each line in RStudio and use the [Export] button, making figure generation non-deterministic
+6. improper object instantiation: filtered dataframes or data subsets are saved in permanent variables, signaling they might be important but are never used again
+7. lack of abstraction: no examples of functions that could save time
 
-1. Install Miniconda3 from  [here](https://docs.conda.io/en/latest/miniconda.html). I downloaded the `Miniconda3-latest-MacOSX-arm64.sh` and used `chmod +x` to make it exectuable. See: [https://protocols.hostmicrobe.org/conda](https://protocols.hostmicrobe.org/conda).
+These anti-patterns obscured the logic of scripts that should have otherwise been straightforward. During the course, I found myself having to really work at getting each line of code to work. Having to focus most of my time and effort on fixing broken lines of code and fixing library installations took time away from the most important part of the course: learning what the code actually does, learning which algorithms to use, and learning which visualizations to best display the data.
+
+So in this repo, I meticulously refactored each script in such a way that it should run directly out of the box in your command line if you have the required files and libraries installed. Each script is structured in the following standardized way:
+
+1. imports at the top
+2. command line options after imports
+3. import data
+4. data wrangling
+5. output figures
+
+That way, if you have a custom analysis, you should be able to reuse the same script, swap out the data, and make minimal adjustments to do roughly the same analysis.
+
+One caveat is that if you are currently taking DIYTranscriptomics and the assignments are still the same, keep in mind that this repo is NOT meant to be a cheat sheet, even if it generates the figures that are supposed to be "the solution." You will still have to understand the data you're working with. You will still have to manually figure out which subset of the data you're interested in. You will still have to do some work to make your figures look pretty. There is always more to do. This is only meant to make your life a little bit easier, not solve all your problems for you.
+
+If you try this code and you run into problems, please reach out to me through my Penn email, and I will be happy to answer your questions.
+
+## Library Installations
+
+This is by far the most frustrating part of the course, so I made sure to document every step in installing it in my 2021 Macbook Pro (M1 chip). Sorry to the Windows folks. Hope you guys get a good TA that uses Windows!
+
+1. Install Miniconda3 from [here](https://docs.conda.io/en/latest/miniconda.html). I downloaded the `Miniconda3-latest-MacOSX-arm64.sh` and used `chmod +x` to make it exectuable. See: [https://protocols.hostmicrobe.org/conda](https://protocols.hostmicrobe.org/conda).
 
 	In general, because trying to resolve issues with the base environment are challenging and can potentially destroy your entire conda installation, it is best practice to never use the base environment for anything and to only ever work in isolated environments. Therefore, create the `rnaseq` conda environment.
 	
@@ -30,9 +57,9 @@ This is where I followed along this RNA-seq data analysis course.
 	git clone https://github.com/Homebrew/brew homebrew
 	eval "$(homebrew/bin/brew shellenv)"
 	brew update --force --quiet
-	export PATH="/Users/wanghc/homebrew/bin:$PATH"
+	export PATH="~/homebrew/bin:$PATH"  # you can replace the ~ with your path to home if this doesn't work
 	
-	brew install kallisto  # Careful! See below.
+	brew install kallisto
 	```
 	
 	Note that this installation is completely separate from conda. If you use use `pip install kallisto`, you will instead get a package from AstraZeneca with the same name, which is used to calculate atomic features. This is not what we want.
@@ -84,6 +111,8 @@ This is where I followed along this RNA-seq data analysis course.
 	```
 
 5. Install Tensorflow and CellAssign.
+
+	Important! Read through this entire section before attempting the installation. This was by far one of the most challenging installations I've ever encountered.
 	
 	In R, the `reticulate` package is used to allow R to access python through conda. By default, it will look for python at `/usr/bin/python3` or `~/miniconda3/bin/python` (your base environment), and then it will be extremely confusing when you run `library('cellassign')` and you get the following error, even though you swear you installed it:
 	
@@ -132,7 +161,7 @@ This is where I followed along this RNA-seq data analysis course.
 	
 	On my system, this gave me tensorflow                2.13.0, tensorflow-base=2.10.0, tensorflow-deps=2.9.0,tensorflow-probability=0.18.0, and keras=2.13.1. Do NOT install tensorflow using pip via `pip install tensorflow`. This will result in an import error.
 	
-	Check that it installed properly:
+	Check that it installed properly. In your R console:
 	
 	```
 	reticulate::use_condaenv('r-reticulate')
@@ -149,7 +178,7 @@ This is where I followed along this RNA-seq data analysis course.
 	ValueError: Tried to convert 'shape' to a tensor and failed.
 	Error: Cannot convert a partially known TensorShape (1, ?) to a Tensor.
 	```
-	If you see this error, you are on the right track, because the solution is documented in [this github issue](https://github.com/Irrationone/cellassign/issues/92#issuecomment-1154355997). Following the solution, fork the repo, then edit [inference-tensorflow.R line 65](https://github.com/Irrationone/cellassign/blob/master/R/inference-tensorflow.R#L165) to be this:
+	If you see this error, you are on the right track, because the solution is documented in [this github issue](https://github.com/Irrationone/cellassign/issues/92#issuecomment-1154355997). Following the solution, what you should do instead is fork the repo, then edit [inference-tensorflow.R line 65](https://github.com/Irrationone/cellassign/blob/master/R/inference-tensorflow.R#L165) to be this:
 	
 	```R
 	p_y_on_c_norm <- tf$reshape(tf$reduce_logsumexp(p_y_on_c_unorm, 0L), as_tensor(shape(1,NULL)))
@@ -164,11 +193,13 @@ This is where I followed along this RNA-seq data analysis course.
 	Alternatively, you could save yourself some hassle by installing from my fork:
 	
 	```
-	devtools::install_github("harrison/cellassign")`
+	devtools::install_github("harrisonized/cellassign")`
 	```
 	However, if you do this, just keep in mind that while it's generally okay to install from well-vetted git repos such as cellassign, installing repos from unknown developers such as myself is a security risk, because you never know if someone committed  malicious code that will execute when you try to run the program. Obviously, I didn't do that, but you get the point.
 	
-6. Installation errors I encountered:
+6. The only library I was unable to install is scater. As such, I hashed out all the lines requiring `scater::plotUMAP`. This is a work-in-progress, I'll get around to it at some point.
+	
+7. Tensorflow installation errors I encountered:
 
 	If your tensorflow-probability version is too low (eg. 0.14.0), you will encounter the following error message:
 	
@@ -210,8 +241,6 @@ This is where I followed along this RNA-seq data analysis course.
 	ImportError: Keras requires TensorFlow 2.2 or higher. Install TensorFlow via `pip install tensorflow`
 	```
 	
-7. Advanced troubleshooting:
-	
 	If you start to install tensorflow without first running `reticulate::use_condaenv('r-reticulate')`, tensorflow will be installed in your base environment, which is NOT what you want. The reason is that you can potentially run into the following issue, and then you'll have to create a new environment anyway.
 	
 	```
@@ -247,7 +276,7 @@ Listed in chronological order:
 | 5 | Lab 6 | R/schistosoma_eda.R | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | Lab 6 | R/schistosoma_pca.R | Performs PCA, then there are examples from gt, DT, and plotly. |
 | 8 | Lab 7 | R/lemis_eda.R | EDA on the lemis dataset. |
 | 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
-| 10 | Lab 9 | R/malaria_pca.R | EDA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
+| 10 | Lab 9 | R/malaria_pca.R | Performs PCA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
 | 11 | Lab 10 | R/covid19\_eda.R | EDA on the covid19 dataset. This is supposed to proceed similarly as the schistosoma and malaria datasets, but I'm going to keep this just as a placeholder. |
 | 12 | Lecture 14 | R/covid19\_scrnaseq\_clustering | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
 | 13 | Lecture 14 | R/covid19\_scrnaseq\_clustering | scRNAseq analysis on covid19_scrnaseq dataset. Does automatic cluster assignment.
