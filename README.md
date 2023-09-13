@@ -8,11 +8,12 @@ However, during the course, I personally found it difficult to follow along, bec
 
 1. code duplication
 2. hard-coding: paths, data, column names, etc.
-3. missing references: some lines reference objects instantiated in previous scripts, requiring you to save all your RData when you close RStudio. If for some reason you clear that, it becomes very challenging to get that back
-4. lack of modularity: data and figures are all input and output into the same directory, making it difficult to figure out which files are required
-5. manual intervention required: instead of using `ggsave()` or `png() plot() dev.off()`, the script expects you to run each line in RStudio and use the [Export] button, making figure generation non-deterministic
-6. improper object instantiation: filtered dataframes or data subsets are saved in permanent variables, signaling they might be important but are never used again
-7. lack of abstraction: no examples of functions that could save time
+3. missing references: some lines reference objects instantiated in previous scripts, requiring you to save all your RData when you close RStudio
+4. lack of modularity: data and figures are all input and output into the same directory, making it difficult to figure out which files are used
+5. manual intervention: instead of using `ggsave()` or `png() plot() dev.off()`, the script expects you to run each line in RStudio and use the [Export] button, making figure generation non-deterministic
+6. improper object instantiation: filtered dataframes or data subsets are saved in permanent variables, signaling they might be important, but then they are never used again
+7. lack of abstraction: no examples of writing reusable functions
+8. improper scoping: importing entire tidyverse package prevents you from knowing which package your function comes from
 
 These anti-patterns obscured the logic of scripts that should have otherwise been straightforward. During the course, I found myself having to really work at getting each line of code to work. Having to focus most of my time and effort on fixing broken lines of code and fixing library installations took time away from the most important part of the course: learning what the code actually does, learning which algorithms to use, and learning which visualizations to best display the data.
 
@@ -272,14 +273,14 @@ Listed in chronological order:
 | 1 | Lecture 2 | bash/build\_kallisto\_index.sh  | Use Kallisto to build an index on leishmania dataset |
 | 2 | Lab 2 | bash/map\_reads.sh | Use Kallisto to map reads to the index file on leishmania dataset |
 | 3 | Lab 5 | bash/estimate\_sequence\_similarity.sh | Use Sourmash to identify non-human reads. Use Centrifuge to search for gene signatures. |
-| 4 | Lab 4 | R/leishmania_annotate\_gene\_expression.R | Use the ferret genome to annotate the leishmania dataset |
-| 5 | Lab 6 | R/schistosoma_eda.R | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 6 | Lab 6 | R/schistosoma_pca.R | Performs PCA, then there are examples from gt, DT, and plotly. |
+| 4 | Lab 4 | R/query\_biomart.R | This standalone script provides an example for how to query bioMart's database. |
+| 5 | Lab 4 | R/leishmania\_annotate\_gene\_expression.R | This script imports the kalliso outputs from the leishmania dataset, using 'EnsDb.Hsapiens.v86' to annotate each row of the resulting dataframe. |
+| 6 | Lab 6 | R/schistosoma_eda.R | Concatenates the abundance.tsv files in the schistosoma dataset and creates some violin plots || 7 | Lab 6 | R/schistosoma_pca.R | Performs PCA, then there are examples from gt, DT, and plotly. |
 | 8 | Lab 7 | R/lemis_eda.R | EDA on the lemis dataset. |
 | 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
 | 10 | Lab 9 | R/malaria_pca.R | Performs PCA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
-| 11 | Lab 10 | R/covid19\_eda.R | EDA on the covid19 dataset. This is supposed to proceed similarly as the schistosoma and malaria datasets, but I'm going to keep this just as a placeholder. |
-| 12 | Lecture 14 | R/covid19\_scrnaseq\_clustering | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
-| 13 | Lecture 14 | R/covid19\_scrnaseq\_clustering | scRNAseq analysis on covid19_scrnaseq dataset. Does automatic cluster assignment.
-| 14 | Lecture 14 | R/toxoplasma\_data\_integration | Compares two seurat objects from the toxoplasma dataset. |
-
-The only script not explictly addressed is `Step7_functionalEnrichment.R` from Lecture 10. Also need to figure out how to install scater. All of lines requiring `scater::plotUMAP` have been hashed out.
+| 11 | Lab 10 | R/covid19\_eda.R | EDA on the covid19 dataset. This is supposed to proceed similarly as the schistosoma and malaria datasets, but I didn't do any work here and I'm going to leave it as such. |
+| 12 | Lecture 14 | R/covid19\_scrnaseq\_clustering.R | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
+| 13 | Lecture 14 | R/covid19\_scrnaseq\_seurat.R | scRNAseq analysis on covid19_scrnaseq dataset. Plots a UMAP and finds cluster-specific genes. |
+| 14 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. |
+| 15 | Lecture 10 | R/malaria\_functional\_enrichment.R | This is the only script that has not been addressed, because it was skipped during the main course. |

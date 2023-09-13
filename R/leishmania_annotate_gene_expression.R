@@ -1,76 +1,65 @@
-## This pipeline is used to annotate gene expression data
-## This is adapted from 
+## Source: Step1_TxImport.R
+## This script imports the kalliso outputs from the leishmania dataset
+## using 'EnsDb.Hsapiens.v86' to annotate each row of the resulting dataframe.
+## No outputs, run this in RStudio
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-library('EnsDb.Hsapiens.v86')
-library('BSgenome.Mfuro.UCSC.musFur1')
-library('biomaRt')
-source(file.path(wd, 'R', 'utils.R'))
+suppressMessages(library('EnsDb.Hsapiens.v86'))
+# suppressMessages(library('BSgenome.Mfuro.UCSC.musFur1'))
+suppressMessages(library('GenomicFeatures'))
+library('optparse')
+library('logr')
+source(file.path(wd, 'R', 'utils.R'))    # list_files, filter_list_for_match
 
 
 # ----------------------------------------------------------------------
-# Load transcripts
+# Pre-script settings
 
-Tx <- transcripts(EnsDb.Hsapiens.v86, columns=c("tx_id", "gene_name"))
+# args
+option_list = list(
+    make_option(c("-i", "--input-dir"), default="data/leishmania/mapped_reads",
+                metavar="data/leishmania/mapped_reads", type="character",
+                help="set the input directory"),
 
-# Tx <- transcripts(BSgenome.Mfuro.UCSC.musFur1, columns=c("tx_id", "gene_name"))
-# unable to find an inherited method for function 'transcripts' for signature '"BSgenome"'
+    make_option(c("-f", "--file-ext"), default="h5",
+                metavar="h5", type="character",
+                help="Choose: 'h5' or 'tsv'. 'h5' is faster for importing data"),
 
-# ----------------------------------------------------------------------
-# Get from biomart
-
-# myMart <- useMart(biomart="ENSEMBL_MART_ENSEMBL")
-# available.datasets <- listDatasets(myMart)
-
-# get ferret genome
-ferret.anno <- useMart(biomart="ENSEMBL_MART_ENSEMBL", dataset = "mpfuro_gene_ensembl")
-ferret.attributes <- listAttributes(ferret.anno)
-Tx.ferret <- getBM(
-    attributes=c('ensembl_transcript_id_version', 'external_gene_name'),
-    mart = ferret.anno
-)  # query the biomaRt database
-
-Tx.ferret <- tidyr::as_tibble(Tx.ferret)  # convert to tibble
-Tx.ferret <- dplyr::rename(
-    Tx.ferret, target_id = ensembl_transcript_id_version, 
-    gene_name = external_gene_name
-)  # rename columns
-
-
-# annotate
-files = filter_list_for_match(
-    list_files(file.path(wd, "data", "leishmania", "mapped_reads")),
-    'h5'  # file_ext
+    make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
+                metavar="FALSE", type="logical",
+                help="disable if for troubleshooting to prevent overwriting your files")
 )
+opt_parser = OptionParser(option_list=option_list)
+opt = parse_args(opt_parser)
+troubleshooting = opt['troubleshooting'][[1]]
 
-Txi_gene <- tximport::tximport(
+# Start Log
+start_time = Sys.time()
+log <- log_open(paste("eda ", start_time, '.log', sep=''))
+log_print(paste('Script started at:', start_time))
+
+
+# ----------------------------------------------------------------------
+# Import Kallisto data
+
+# define data sources
+files = filter_list_for_match(
+    list_files(file.path(wd, opt['input-dir'][[1]])),
+    opt['file-ext'][[1]]  # file_ext
+)
+tx2gene_obj <- GenomicFeatures::transcripts(EnsDb.Hsapiens.v86, columns=c("tx_id", "gene_name"))
+
+# annotate, returns a list of dataframes
+sample_txi <- tximport::tximport(
     files,  # load data from mapped_reads
     type = "kallisto", 
-    tx2gene = Tx,
+    tx2gene = tx2gene_obj,
     txOut = TRUE,  # if this is false, it doesn't work
     countsFromAbundance = "lengthScaledTPM",
     ignoreTxVersion = TRUE
 )
 
-
-# ----------------------------------------------------------------------
-# Get ferret promoter genes
-
-# Help
-# ?getSequence
-
-# This is just doing a SQL query
-# IFIT2, OAS2, IRF1, IFNAR1, and MX1
-sequences = getSequence(
-    id = c("IFIT2", "OAS2", "IRF1", "IFNAR1", "MX1"),
-    type = "external_gene_name",  # or "hgnc_symbol" and "uniprot_gn_symbol" are missing MX1
-    seqType = "coding_gene_flank",
-    upstream = 1000,
-    mart = ferret.anno
-)
-
-# Error in .processResults(postRes, mart = mart, hostURLsep = sep, fullXmlQuery = fullXmlQuery,  : 
-# Query ERROR: caught BioMart::Exception::Database: 
-# Error during query execution: You have an error in your SQL syntax; 
-# check the manual that corresponds to your MySQL server version for the right syntax to use near
-# 'AND main.transcript_id_1064_key=mpfuro_gene_ensembl__exon_transcript__dm.transcr' at line 1
+end_time = Sys.time()
+log_print(paste('Script ended at:', Sys.time()))
+log_print(paste("Script completed in:", difftime(end_time, start_time)))
+log_close()
