@@ -9,22 +9,17 @@
 # Notes:
 # recall that your abundance data are TPM, while the counts are read counts mapping to each gene or transcript
 
-
-wd = '/home/harrisonized/github/diy-transcriptomics'
-
 # Load packages -----
 library(tidyverse) # already know about this from Step 1 script
 library(edgeR) # well known package for differential expression analysis, but we only use for the DGEList object and for normalization methods
 library(matrixStats) # let's us easily calculate stats on rows or columns of a data matrix
 library(cowplot) # allows you to combine multiple plots in one figure
 
-
 # Examine your data up to this point ----
-# figure this out later
-# Txi_gene_abundance = read.csv(file.path(wd, 'data', 'lab_6', "Txi_gene_abundance.csv"), row.names = 1)
-# Txi_gene$counts = read.csv(file.path(wd, 'data', 'lab_6', "Txi_gene_counts.csv"), row.names = 1)
-# colSums(Txi_gene$abundance)
-# colSums(Txi_gene_counts)
+myTPM <- Txi_gene$abundance
+myCounts <- Txi_gene$counts
+colSums(myTPM)
+colSums(myCounts)
 
 # capture sample labels from the study design file that you worked with and saved as 'targets' in step 1
 targets
@@ -34,17 +29,17 @@ sampleLabels <- targets$sample
 # 1st, calculate summary stats for each transcript or gene, and add these to your data matrix
 # then use the base R function 'transform' to modify the data matrix (equivalent of Excel's '=')
 # then we use the 'rowSds', 'rowMeans' and 'rowMedians' functions from the matrixStats package
-Txi_gene$abundance <- transform(Txi_gene$abundance, 
-                         SD=rowSds(Txi_gene$abundance), 
-                         AVG=rowMeans(Txi_gene$abundance),
-                         MED=rowMedians(Txi_gene$abundance))
+myTPM.stats <- transform(myTPM, 
+                         SD=rowSds(myTPM), 
+                         AVG=rowMeans(myTPM),
+                         MED=rowMedians(myTPM))
 
 # look at what you created
-head(Txi_gene$abundance)
+head(myTPM.stats)
 
 # Create your first plot using ggplot2 ----
 # produce a scatter plot of the transformed data
-ggplot(Txi_gene$abundance) + 
+ggplot(myTPM.stats) + 
   aes(x = SD, y = MED) +
   geom_point(shape=25, size=3)
 # Experiment with point shape and size in the plot above
@@ -53,7 +48,7 @@ ggplot(Txi_gene$abundance) +
 # How would these graphs change if you log2 converted the data?
 
 # Let's expand on the plot above a bit more and take a look at each 'layer' of the ggplot code
-ggplot(Txi_gene$abundance) + 
+ggplot(myTPM.stats) + 
   aes(x = SD, y = MED) +
   geom_point(shape=16, size=2) +
   geom_smooth(method=lm) +
@@ -66,15 +61,14 @@ ggplot(Txi_gene$abundance) +
   theme_dark() + 
   theme_bw()
 
-
 # Make a DGElist from your counts, and plot ----
-myDGEList <- DGEList(Txi_gene$counts)
+myDGEList <- DGEList(myCounts)
 # take a look at the DGEList object 
 myDGEList
 #DEGList objects are a good R data file to consider saving to you working directory
-save(myDGEList, file = "myDGEList.txt")
+save(myDGEList, file = "myDGEList")
 #Saved DGEList objects can be easily shared and loaded into an R environment
-load(file = "myDGEList.txt")
+load(file = "myDGEList")
 
 # use the 'cpm' function from EdgeR to get counts per million
 cpm <- cpm(myDGEList) 
@@ -96,7 +90,7 @@ log2.cpm.df.pivot <- pivot_longer(log2.cpm.df, # dataframe to be pivoted
 log2.cpm.df.pivot
 
 # not it is easy to plot this pivoted data
-p1 <- ggplot(log2.cpm.df.pivot) +
+ggplot(log2.cpm.df.pivot) +
   aes(x=samples, y=expression, fill=samples) +
   geom_violin(trim = FALSE, show.legend = FALSE) +
   stat_summary(fun = "median", 
@@ -144,7 +138,7 @@ log2.cpm.filtered.df.pivot <- pivot_longer(log2.cpm.filtered.df, # dataframe to 
                                            values_to = "expression") # name of new variable (column) storing all the values (data)
 
 
-p2 <- ggplot(log2.cpm.filtered.df.pivot) +
+ggplot(log2.cpm.filtered.df.pivot) +
   aes(x=samples, y=expression, fill=samples) +
   geom_violin(trim = FALSE, show.legend = FALSE) +
   stat_summary(fun = "median", 
@@ -174,7 +168,7 @@ log2.cpm.filtered.norm.df.pivot <- pivot_longer(log2.cpm.filtered.norm.df, # dat
                                                 values_to = "expression") # name of new variable (column) storing all the values (data)
 
 
-p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
+ggplot(log2.cpm.filtered.norm.df.pivot) +
   aes(x=samples, y=expression, fill=samples) +
   geom_violin(trim = FALSE, show.legend = FALSE) +
   stat_summary(fun = "median", 
@@ -193,8 +187,7 @@ p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
 # go back and assign each plot to a variable (rather than printing to the plots viewer)
 # here we assigned the last 3 plots to p1, p2 and p3
 # we'll use the 'plot_grid' function from the cowplot package to put these together in a figure
-library(cowplot)
-cowplot::plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
+plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
 print("Step 2 complete!")
 
 # the essentials ----
@@ -280,4 +273,5 @@ p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
        caption=paste0("produced on ", Sys.time())) +
   theme_bw()
 
-cowplot::plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
+plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
+

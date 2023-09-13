@@ -14,7 +14,6 @@ targets
 group <- targets$group
 group <- factor(group)
 
-
 # Prepare your data -------
 # for this part of the class you'll use your normalized and filtered data in log2 cpm
 # make sure you have this object already in your work environment
@@ -70,18 +69,18 @@ ggplot(pca.res.df) +
 
 # Create a PCA 'small multiples' chart ----
 # this is another way to view PCA laodings to understand impact of each sample on each pricipal component
-pca.res.df <- pca.res$x[,1:9] %>% # note that this is the first time you've seen the 'pipe' operator from the magrittr package
+pca.res.df <- pca.res$x[,1:4] %>% # note that this is the first time you've seen the 'pipe' operator from the magrittr package
   as_tibble() %>%
-  add_column(sample = sample,
+  add_column(sample = sampleLabels,
              group = group)
   
 pca.pivot <- pivot_longer(pca.res.df, # dataframe to be pivoted
-                          cols = PC1:PC9, # column names to be stored as a SINGLE variable
+                          cols = PC1:PC4, # column names to be stored as a SINGLE variable
                           names_to = "PC", # name of that new variable (column)
                           values_to = "loadings") # name of new variable (column) storing all the values (data)
 
 ggplot(pca.pivot) +
-  aes(x=aes::fill(), y=loadings, fill=group) + # you could iteratively 'paint' different covariates onto this plot using the 'fill' aes
+  aes(x=sample, y=loadings, fill=group) + # you could iteratively 'paint' different covariates onto this plot using the 'fill' aes
   geom_bar(stat="identity") +
   facet_wrap(~PC) +
   labs(title="PCA 'small multiples' plot",
@@ -156,7 +155,7 @@ mydata.filter %>%
 
 
 # Make an interactive table using the DT package ----
-DT::datatable(mydata.df[,c(1,12:14)], 
+datatable(mydata.df[,c(1,12:14)], 
           extensions = c('KeyTable', "FixedHeader"), 
           filter = 'top',
           options = list(keys = TRUE, 
@@ -166,7 +165,6 @@ DT::datatable(mydata.df[,c(1,12:14)],
 
 # Make an interactive scatter plot with plotly -----
 # begin by storing your ggplot object
-library(plotly)
 myplot <- ggplot(mydata.df) + 
   aes(x=healthy.AVG, y=disease.AVG) +
   geom_point(shape=16, size=1) +
@@ -219,7 +217,7 @@ mydata.df <- mutate(log2.cpm.filtered.norm.df,
                     LogFC = (disease.AVG - healthy.AVG)) %>% #note that this is the first time you've seen the 'pipe' operator
   mutate_if(is.numeric, round, 2)
 
-DT::datatable(mydata.df[,c(1,12:14)], 
+datatable(mydata.df[,c(1,12:14)], 
           extensions = c('KeyTable', "FixedHeader"), 
           filter = 'top',
           options = list(keys = TRUE, 
