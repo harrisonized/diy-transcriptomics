@@ -14,7 +14,7 @@ So in this repo, I meticulously refactored each script in such a way that it sho
 4. data wrangling
 5. output figures
 
-That way, if you have a custom analysis, you should be able to reuse the same script, swap out the data, and make minimal adjustments to do roughly the same analysis, and you will be able to copy code chunks to put together a script much like you assemble a castle out of legos.
+That way, if you have a custom analysis, you should be able to reuse the same script, swap out the data, and make minimal adjustments to do roughly the same analysis, and you will be able to copy code chunks to put together a script, much like you can assemble a castle out of legos.
 
 One caveat is that if you are currently taking DIYTranscriptomics and the assignments are still the same, keep in mind that this repo is NOT meant to be a cheat sheet, even if it generates the figures that are supposed to be "the solution." You will still have to understand the data you're working with. You will still have to manually figure out which subset of the data you're interested in. You will still have to do some work to make your figures look pretty. There is always more to do. This is only meant to make your life a little bit easier, not solve all your problems for you.
 
