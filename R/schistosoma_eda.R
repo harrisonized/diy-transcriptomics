@@ -1,13 +1,14 @@
 ## Adapted from: Step1_TxImport.R, Step2_dataWrangling
 ## Concatenates the abundance files in the schistosoma dataset and creates some violin plots
+## Note that this contains code duplication. However, that is acceptable here, because this is only EDA
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 # library(tidyverse)  # too broad
 library('readr')  # read_tsv
 suppressMessages(library('dplyr'))
-library('tidyr')  # pivot_longer
+suppressMessages(library('tidyr'))  # pivot_longer
 library('tibble')  # as_tibble
-suppressMessages(library('matrixStats'))  # colSums, rowSums
+suppressMessages(library('matrixStats'))  # rowSums
 library('ggplot2')  # ggplot
 library('cowplot')  # plot_grid
 library('tximport')  # tx_import
@@ -79,23 +80,34 @@ txi <- tximport(
     ignoreTxVersion = TRUE
 )
 
-# update column names
-sample_ids = unlist(lapply(abundance_filepaths, function(x) basename(dirname(x))))
-colnames(txi$counts) <- unlist(lapply(sample_ids, function(x) paste(x, '_count', sep='')))
-colnames(txi$abundance) <- unlist(lapply(sample_ids, function(x) paste(x, '_abundance', sep='')))
-colnames(txi$length) <- unlist(lapply(sample_ids, function(x) paste(x, '_length', sep='')))
+# updates columns to `filename_suffix`, eg. F12h_LE_1_abundance
+suffix_for_col = c(
+    'counts'='_count',
+    'abundance'='_abundance',
+    'length'='_length'
+)
+sample_ids = unlist(lapply(files, function(x) basename(dirname(x))))
+for (col in names(suffix_for_col)){
+    suffix = suffix_for_col[col][[1]]
+    colnames(txi[[col]]) <- unlist(lapply(sample_ids, function(x) paste(x, suffix, sep='')))
+}
 
+# save
 if (!troubleshooting) {
+
     log_print(paste(Sys.time(), 'Saving txi files...'))
+    
     if (!dir.exists(file.path(wd, dirname(opt['input-dir'][[1]]), 'txi'))) {
         dir.create(file.path(wd, dirname(opt['input-dir'][[1]]), 'txi'), recursive=TRUE)
     }
-    write.table(txi$counts,
+    write.table(txi[['counts']],
                 file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_counts.csv'),
                 quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
-    write.table(txi$abundance,
+    write.table(txi[['abundance']],
                 file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_abundances.csv'),
                 quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
+
+    # don't need this
     # write.table(txi$length,
     #             file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_lengths.csv'),
     #             quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
@@ -103,90 +115,20 @@ if (!troubleshooting) {
 
 
 # ----------------------------------------------------------------------
-# Transform data
-# Adapted from Step2_dataWrangling
+# Unfiltered, non-normalized abundance (tpm)
 
-# Add SD, AVG, and MED as columns to the txi$abundance tibble for plotting later
-txi$abundance <- transform(
-    txi$abundance,
-    SD=rowSds(txi$abundance),
-    AVG=rowMeans(txi$abundance),
-    MED=rowMedians(txi$abundance)
+log_print(paste(Sys.time(), 'Plotting unfiltered, non-normalized abundance...'))
+
+# Add SD, AVG, and MED as columns to the abundances matrix
+abundance_matrix = as.matrix(txi[['abundance']][, !(colnames(txi[['abundance']]) %in% c('SD', 'AVG', 'MED'))])
+txi[['abundance']] <- transform(
+    abundance_matrix,
+    SD=rowSds(abundance_matrix),
+    AVG=rowMeans(abundance_matrix),
+    MED=rowMedians(abundance_matrix)
 )
 
-# Create DGElist
-# See: https://www.rdocumentation.org/packages/edgeR/versions/3.14.0/topics/DGEList-class
-dge_list <- edgeR::DGEList(txi$counts)
-
-# note: this doesn't work for some reason
-if (FALSE) {
-    save(dge_list, file=file.path(wd, dirname(opt['input-dir'][[1]]), "dge_list.txt"))
-    load(file=file.path(wd, dirname(opt['input-dir'][[1]]), "dge_list.txt"))  # example load
-}
-
-# unfiltered, non-normalized cpm
-cpm <- edgeR::cpm(dge_list)
-log2.cpm <- edgeR::cpm(dge_list, log=TRUE)
-log2.cpm.df <- as_tibble(log2.cpm, rownames = "geneID")
-colnames(log2.cpm.df) <- c("geneID", sample_ids)
-log2.cpm.df.pivot <- pivot_longer(
-    log2.cpm.df, # dataframe to be pivoted
-    # column names to be stored as a SINGLE variable
-    cols = colnames(log2.cpm.df[, c(2 :length(log2.cpm.df))]),
-    names_to = "samples", # name of that new variable (column)
-    values_to = "expression"
-)
-
-# filtered, non-normalized cpm
-# table(rowSums(dge_list$counts==0)==10)
-keepers <- rowSums(cpm>1)>=5  # filter
-dge_list.filtered <- dge_list[keepers,]
-# dim(dge_list.filtered)
-
-# filtered, non-normalized cpm
-log2.cpm.filtered <- cpm(dge_list.filtered, log=TRUE)
-log2.cpm.filtered.df <- as_tibble(log2.cpm.filtered, rownames = "geneID")
-colnames(log2.cpm.filtered.df) <- c("geneID", sample_ids)
-# pivot this FILTERED data, just as you did earlier
-log2.cpm.filtered.df.pivot <- pivot_longer(log2.cpm.filtered.df, # dataframe to be pivoted
-                                           cols = colnames(log2.cpm.df[, c(2 :length(log2.cpm.df))]), # column names to be stored as a SINGLE variable
-                                           names_to = "samples", # name of that new variable (column)
-                                           values_to = "expression") # name of new variable (column) storing all the values (data) n
-
-# filtered, normalized cpm
-# need this for the next script
-dge_list.filtered.norm <- calcNormFactors(dge_list.filtered, method = "TMM")
-log2.cpm.filtered.norm <- cpm(dge_list.filtered.norm, log=TRUE)
-log2.cpm.filtered.norm.df <- as_tibble(log2.cpm.filtered.norm, rownames = "gene_ID")
-colnames(log2.cpm.filtered.norm.df) <- c("gene_ID", sample_ids)
-
-# save
-if (!troubleshooting) {
-    log_print(paste(Sys.time(), 'Saving filtered, normalized cpm...'))
-    write.table(
-        log2.cpm.filtered.norm.df,
-        file.path(wd, dirname(opt['input-dir'][[1]]), 'filtered_normalized_cpm.csv'),
-        quote=FALSE, col.names=TRUE, row.names=FALSE, sep=','
-    )
-}
-
-
-log2.cpm.filtered.norm.df.pivot <- pivot_longer(
-    log2.cpm.filtered.norm.df, # dataframe to be pivoted
-    cols = colnames(log2.cpm.df[, c(2 :length(log2.cpm.df))]), # column names to be stored as a SINGLE variable
-    names_to = "samples", # name of that new variable (column)
-    values_to = "expression"
-) # name of new variable (column) storing all the values (data)
-
-
-# ----------------------------------------------------------------------
-# Plot figures
-# Adapted from Step2_dataWrangling
-
-
-# Plot tpm unfiltered, non-normalized tpm
-log_print(paste(Sys.time(), 'Plotting unfiltered, non-normalized tpm...'))
-fig <- ggplot(txi$abundance) + 
+fig <- ggplot(txi[['abundance']]) + 
     aes(x = SD, y = MED) +
     geom_point(shape=16, size=2) +
     geom_smooth(method=lm) +
@@ -200,14 +142,39 @@ fig <- ggplot(txi$abundance) +
     theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['input-dir'][[1]], 'eda', 'tpm_unfiltered_nonnormalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_unfiltered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 
-# Plot unfiltered, un-normalized log2 cpm
-log_print(paste(Sys.time(), 'Plotting unfiltered, un-normalized log2 cpm...'))
-p1 <- ggplot(log2.cpm.df.pivot) +
+# ----------------------------------------------------------------------
+# Create DGElist from counts
+
+# See: https://www.rdocumentation.org/packages/edgeR/versions/3.14.0/topics/DGEList-class
+dge_list <- edgeR::DGEList(txi[['counts']])
+if (FALSE) {
+    # note: this doesn't work for some reason
+    save(dge_list, file=file.path(wd, dirname(opt['input-dir'][[1]]), "dge_list.txt"))
+    load(file=file.path(wd, dirname(opt['input-dir'][[1]]), "dge_list.txt"))  # example load
+}
+
+
+# ----------------------------------------------------------------------
+# Unfiltered, non-normalized log2 counts (cpm)
+
+log_print(paste(Sys.time(), 'Plotting unfiltered, non-normalized log2 counts...'))
+
+cpm_wide <- as_tibble(cpm(dge_list, log=TRUE), rownames = "geneID")
+colnames(cpm_wide) <- c("geneID", sample_ids)
+
+# reshape for plotting
+cpm_long <- pivot_longer(
+    cpm_wide,
+    cols = colnames(cpm_wide[, c(2 :length(cpm_wide))]),
+    names_to = "samples",
+    values_to = "expression"
+)
+p1 <- ggplot(cpm_long) +
   aes(x=samples, y=expression, fill=samples) +
   geom_violin(trim = FALSE, show.legend = FALSE) +
   stat_summary(fun = "median", 
@@ -222,15 +189,31 @@ p1 <- ggplot(log2.cpm.df.pivot) +
        # caption=paste0("produced on ", Sys.time())
        ) +
   theme_bw()
+
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['input-dir'][[1]], 'eda', 'cpm_unfiltered_nonnormalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cpm_unfiltered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 
-# Plot filtered, non-normalized counts per million
-log_print(paste(Sys.time(), 'Plotting filtered, non-normalized cpm...'))
-p2 <- ggplot(log2.cpm.filtered.df.pivot) +
+# ----------------------------------------------------------------------
+# Filtered, non-normalized log2 counts (cpm)
+
+log_print(paste(Sys.time(), 'Plotting filtered, non-normalized log2 counts...'))
+
+dge_subset <- dge_list[rowSums(cpm_wide>1)>=5,]
+cpm_wide <- as_tibble(cpm(dge_subset, log=TRUE), rownames = "geneID")
+colnames(cpm_wide) <- c("geneID", sample_ids)
+
+# reshape for plotting
+cpm_long <- pivot_longer(
+    cpm_wide,
+    cols = colnames(cpm_wide[, c(2 :length(cpm_wide))]),
+    names_to = "samples",
+    values_to = "expression"
+)
+
+p2 <- ggplot(cpm_long) +
     aes(x=samples, y=expression, fill=samples) +
     geom_violin(trim = FALSE, show.legend = FALSE) +
     stat_summary(fun = "median", 
@@ -244,17 +227,40 @@ p2 <- ggplot(log2.cpm.filtered.df.pivot) +
         subtitle="filtered, non-normalized",
         caption=paste0("produced on ", Sys.time())) +
     theme_bw()
-# Also: try using coord_flip() at the end of the ggplot code
+    # coord_flip()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['input-dir'][[1]], 'eda', 'tpm_filtered_nonnormalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_filtered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 
-# Plot filtered, normalized cpm
-log_print(paste(Sys.time(), 'Plotting filtered, normalized cpm...'))
-p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
+# ----------------------------------------------------------------------
+# Filtered, normalized log2 counts (cpm)
+
+log_print(paste(Sys.time(), 'Plotting filtered, normalized log2 counts...'))
+
+dge_subset_norm <- calcNormFactors(dge_subset, method = "TMM")
+cpm_norm_wide <- as_tibble(cpm(dge_subset_norm, log=TRUE), rownames = "gene_ID")
+colnames(cpm_norm_wide) <- c("gene_ID", sample_ids)
+colnames(cpm_norm_wide) <- c("geneID", sample_ids)
+if (!troubleshooting) {
+    write.table(
+        cpm_norm_wide,
+        file.path(wd, dirname(opt['input-dir'][[1]]), 'filtered_normalized_cpm.csv'),
+        quote=FALSE, col.names=TRUE, row.names=FALSE, sep=','
+    )
+}
+
+# reshape for plotting
+cpm_norm_long <- pivot_longer(
+    cpm_norm_wide,
+    cols = colnames(cpm_norm_wide[, c(2 :length(cpm_norm_wide))]),
+    names_to = "samples",
+    values_to = "expression"
+)
+
+p3 <- ggplot(cpm_norm_long) +
   aes(x=samples, y=expression, fill=samples) +
   geom_violin(trim = FALSE, show.legend = FALSE) +
   stat_summary(fun = "median", 
@@ -268,16 +274,22 @@ p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
        subtitle="filtered, TMM normalized",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw()
+
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['input-dir'][[1]], 'eda', 'tpm_filtered_normalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_filtered_normalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
-# Plot all violins together
+
+# ----------------------------------------------------------------------
+#  Plot all violins together
+
 log_print(paste(Sys.time(), 'Plotting cowplot...'))
+
 cowplot::plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
+
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['input-dir'][[1]], 'eda', 'cowplot.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cowplot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
