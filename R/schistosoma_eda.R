@@ -81,7 +81,7 @@ txi <- tximport(
     ignoreTxVersion = TRUE
 )
 
-# updates columns to `filename_suffix`, eg. F12h_LE_1_abundance
+# update columns to `filename_suffix`, eg. F12h_LE_1_abundance
 suffix_for_col = c(
     'counts'='_count',
     'abundance'='_abundance',

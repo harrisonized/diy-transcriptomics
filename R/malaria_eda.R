@@ -1,18 +1,19 @@
-# Lab 9
-# Ask is to go through the Step_1 through Step_6 scripts and generate some figures
+## Adapted from: malarialab_solution.R
+## Concatenates the abundance files in the malaria dataset and creates some violin plots
+## This script is almost a duplicate of malaria_eda.R
 
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-source(file.path(wd, 'R', 'utils.R'))
 # library(tidyverse) # too broad
-library('readr')  # read_tsv
-library('tidyr')  # pivot_longer
-library('edgeR')  # DGEList
+suppressMessages(library('readr'))  # read_tsv
+suppressMessages(library('tidyr'))  # pivot_longer
+suppressMessages(library('edgeR'))  # DGEList
 library('ggplot2')
 library('tibble')
 library('tximport')
 library('optparse')
 library('logr')
+source(file.path(wd, 'R', 'utils.R'))  # list_files, filter_list_for_match
 
 
 # ----------------------------------------------------------------------
@@ -20,6 +21,18 @@ library('logr')
 
 # args
 option_list = list(
+    make_option(c("-i", "--input-dir"), default="data/malaria/mapped_reads",
+                metavar="data/malaria/mapped_reads", type="character",
+                help="set the input directory"),
+
+    make_option(c("-f", "--filename"), default="abundance.h5",
+                metavar="abundance.h5", type="character",
+                help="Choose: 'abundance.h5' or 'abundance.tsv'. '.h5' is faster for importing data"),
+
+    make_option(c("-o", "--output-dir"), default="figures/malaria",
+                metavar="figures/malaria", type="character",
+                help="set the output directory for the figures"),
+    
     make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
                 metavar="FALSE", type="logical",
                 help="enable if troubleshooting to prevent overwriting your files")
@@ -37,66 +50,85 @@ log_print(paste('Script started at:', start_time))
 # ----------------------------------------------------------------------
 # Read Data
 
-# metadata
-targets <- read_tsv(file.path(wd, 'data', 'malaria', "studyDesign.txt"))
-sample_ids <- targets$sample
+log_print(paste(Sys.time(), 'Reading files...'))
 
-# main data
-paths = filter_list_for_match(
-    list_files(file.path(wd, 'data', 'malaria')),
-    'abundance.h5'
+# define data source
+# malaria dataset has 14 files
+files = filter_list_for_match(
+    list_files(file.path(wd, opt['input-dir'][[1]])),
+    opt['filename'][[1]]  # file_ext
 )
+
+# Read abundance files into a txi object
 txi_gene <- tximport(
-    paths,
+    files,
     type = "kallisto",
-    txOut = TRUE, # determines whether your data represented at transcript or gene level
+    # tx2gene = tx2gene_obj,  # the solution doesn't use this
+    txOut = TRUE,  # determines whether your data represented at transcript or gene level
     countsFromAbundance = "lengthScaledTPM",
     ignoreTxVersion = TRUE
 )
-# update column names, they're not included
-sample_ids = unlist(lapply(paths, function(x) basename(dirname(x))))
-colnames(txi_gene$counts) <- unlist(lapply(sample_ids, function(x) paste(x, '_count', sep='')))
-colnames(txi_gene$abundance) <- unlist(lapply(sample_ids, function(x) paste(x, '_abundance', sep='')))
-colnames(txi_gene$length) <- unlist(lapply(sample_ids, function(x) paste(x, '_length', sep='')))
 
+# update columns
+suffix_for_col = c(
+    'counts'='_count',
+    'abundance'='_abundance',
+    'length'='_length'
+)
+sample_ids = unlist(lapply(files, function(x) basename(dirname(x))))
+for (col in names(suffix_for_col)){
+    suffix = suffix_for_col[col][[1]]
+    colnames(txi_gene[[col]]) <- unlist(lapply(sample_ids, function(x) paste(x, suffix, sep='')))
+}
+
+# save
 if (!troubleshooting) {
+    
     log_print(paste(Sys.time(), 'Saving txi files...'))
+    
     if (!dir.exists(file.path(wd, 'data', 'malaria', 'txi'))) {
         dir.create(file.path(wd, 'data', 'malaria', 'txi'), recursive=TRUE)
     }
     write.table(txi_gene$counts,
-                file.path(wd, 'data', 'malaria', 'txi', 'txi_counts.csv'),
+                file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_counts.csv'),
                 quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
     write.table(txi_gene$abundance,
-                file.path(wd, 'data', 'malaria', 'txi', 'txi_abundances.csv'),
+                file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_abundances.csv'),
                 quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
+    
     # write.table(txi_gene$length,
-    #             file.path(wd, 'data', 'malaria', 'txi', 'txi_lengths.csv'),
+    #             file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_lengths.csv'),
     #             quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
 }
 
-myDGEList <- DGEList(txi_gene$counts)
-log2.cpm <- cpm(myDGEList, log=TRUE)
+# metadata
+targets <- read_tsv(file.path(wd, 'data', 'malaria', "studyDesign.txt"))
+sample_ids <- targets$sample
 
 
 # ----------------------------------------------------------------------
-# EDA
-# from malarialab_solution.R
+# Create DGElist from counts
+
+dge_list <- DGEList(txi_gene[['counts']])
 
 
-# Plot unfiltered, un-normalized log2 cpm
-log_print(paste(Sys.time(), 'Plotting unfiltered, un-normalized log2 cpm...'))
+# ----------------------------------------------------------------------
+# Raw log2 counts (cpm)
 
-log2.cpm.df <- as_tibble(log2.cpm, rownames = "geneID")
-colnames(log2.cpm.df) <- c("geneID", sample_ids)
-log2.cpm.df.pivot <- pivot_longer(
-    log2.cpm.df, # dataframe to be pivoted
+log_print(paste(Sys.time(), 'Plotting raw log2 counts...'))
+
+cpm_wide <- as_tibble(cpm(dge_list, log=TRUE), rownames = "target_id")
+colnames(cpm_wide) <- c("target_id", sample_ids)
+
+# reshape for plotting
+cpm_long <- pivot_longer(
+    cpm_wide,
     cols = -1, # column names to be stored as a SINGLE variable
-    names_to = "samples", # name of that new variable (column)
+    names_to = "samples",
     values_to = "expression"
-) # name of new variable (column) storing all the values (data)
+)
 
-p1 <- ggplot(log2.cpm.df.pivot) +
+p1 <- ggplot(cpm_long) +
   aes(x=samples, y=expression, fill=samples) +
   geom_violin(trim = FALSE, show.legend = FALSE) +
   stat_summary(fun = "median", 
@@ -112,27 +144,29 @@ p1 <- ggplot(log2.cpm.df.pivot) +
   theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, 'figures', 'malaria', 'eda', 'cpm_unfiltered_nonnormalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cpm_unfiltered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 
-# Plot filtered, non-normalized counts per million
-log_print(paste(Sys.time(), 'Plotting filtered, non-normalized cpm...'))
+# ----------------------------------------------------------------------
+# Filtered log2 counts (cpm)
 
-cpm <- cpm(myDGEList)
-keepers <- rowSums(cpm>1)>=2 #user defined
-myDGEList.filtered <- myDGEList[keepers,]
+log_print(paste(Sys.time(), 'Plotting filtered log2 counts...'))
 
-log2.cpm.filtered <- cpm(myDGEList.filtered, log=TRUE)
-log2.cpm.filtered.df <- as_tibble(log2.cpm.filtered, rownames = "geneID")
-colnames(log2.cpm.filtered.df) <- c("geneID", sample_ids)
-log2.cpm.filtered.df.pivot <- pivot_longer(log2.cpm.filtered.df, # dataframe to be pivoted
-                                           cols = -1, # column names to be stored as a SINGLE variable
-                                           names_to = "samples", # name of that new variable (column)
-                                           values_to = "expression") # name of new variable (column) storing all the values (data)
+dge_subset <- dge_list[rowSums(cpm_wide>1)>=2,]
+cpm_wide <- as_tibble(cpm(dge_subset, log=TRUE), rownames = "target_id")
+colnames(cpm_wide) <- c("target_id", sample_ids)
 
-p2 <- ggplot(log2.cpm.filtered.df.pivot) +
+# reshape for plotting
+cpm_long <- pivot_longer(
+    cpm_wide,
+    cols = -1,
+    names_to = "samples",
+    values_to = "expression"
+)
+
+p2 <- ggplot(cpm_long) +
     aes(x=samples, y=expression, fill=samples) +
     geom_violin(trim = FALSE, show.legend = FALSE) +
     stat_summary(
@@ -154,28 +188,34 @@ if (!troubleshooting) {
 }
 
 
-# Plot filtered, normalized cpm
-log_print(paste(Sys.time(), 'Plotting filtered, normalized cpm...'))
+# ----------------------------------------------------------------------
+# Filtered, normalized log2 counts (cpm)
 
-myDGEList.filtered.norm <- calcNormFactors(myDGEList.filtered, method = "TMM")
-log2.cpm.filtered.norm <- cpm(myDGEList.filtered.norm, log=TRUE)
-log2.cpm.filtered.norm.df <- as_tibble(log2.cpm.filtered.norm, rownames = "geneID")
-colnames(log2.cpm.filtered.norm.df) <- c("geneID", sample_ids)
-log2.cpm.filtered.norm.df.pivot <- pivot_longer(log2.cpm.filtered.norm.df, # dataframe to be pivoted
-                                                cols = -1, # column names to be stored as a SINGLE variable
-                                                names_to = "samples", # name of that new variable (column)
-                                                values_to = "expression") # name of new variable (column) storing all the values (data)
+log_print(paste(Sys.time(), 'Plotting filtered, normalized log2 counts...'))
 
+dge_subset_norm <- calcNormFactors(dge_subset, method = "TMM")
+cpm_norm_wide <- as_tibble(cpm(dge_subset_norm, log=TRUE), rownames = "target_id")
+colnames(cpm_norm_wide) <- c("target_id", sample_ids)
+
+# required for malaria_pca.R
 if (!troubleshooting) {
     log_print(paste(Sys.time(), 'Saving filtered, normalized cpm...'))
     write.table(
-        log2.cpm.filtered.norm,
-        file.path(wd, 'data', 'malaria', 'filtered_normalized_cpm.csv'),
+        cpm_norm_wide,
+        file.path(wd, dirname(opt['input-dir'][[1]]), 'filtered_normalized_cpm.csv'),
         quote=FALSE, col.names=TRUE, row.names=FALSE, sep=','
     )
 }
 
-p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
+# reshape for plotting
+cpm_norm_long <- pivot_longer(
+    cpm_norm_wide,
+    cols = -1,
+    names_to = "samples",
+    values_to = "expression"
+)
+
+p3 <- ggplot(cpm_norm_long) +
     aes(x=samples, y=expression, fill=samples) +
     geom_violin(trim = FALSE, show.legend = FALSE) +
     stat_summary(fun = "median", 
@@ -196,8 +236,11 @@ if (!troubleshooting) {
 }
 
 
-# Plot all violins together
+# ----------------------------------------------------------------------
+#  Plot all violins together
+
 log_print(paste(Sys.time(), 'Plotting cowplot...'))
+
 cowplot::plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
 if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'eda', 'cowplot.png'),
@@ -209,21 +252,3 @@ end_time = Sys.time()
 log_print(paste('Script ended at:', Sys.time()))
 log_print(paste("Script completed in:", difftime(end_time, start_time)))
 log_close()
-
-
-# ----------------------------------------------------------------------
-# Code graveyard
-
-# txi_gene = join_many_csv(
-#     paths,
-#     index_cols=c('target_id'),
-#     value_cols=c('length', 'eff_length', 'est_counts', 'tpm'),
-#     sep='\t'
-# )
-
-# # Pivot to long format
-# tpm_cols = filter_list_for_match(colnames(txi_gene), pattern=c('tpm'))
-# tpms <- melt(
-#     txi_gene[, c('target_id', tpm_cols)],
-# )
-# colnames(tpms) = c('target_id', 'sample_id', 'tpm')
