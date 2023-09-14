@@ -4,20 +4,9 @@ Course link: [https://diytranscriptomics.com/](https://diytranscriptomics.com/)
 
 This is where I followed along Daniel Beiting's RNA-seq data analysis course. In my opinion, this was a good introductory course for getting started with using some of the basic libraries and functions to analyze some simple bioinformatics datasets, especially if you have no previous coding experience. I liked that all the scripts were designed to be able to run locally, which makes it easy to really examine the objects in RStudio and figure out how the code works.
 
-However, during the course, I personally found it difficult to follow along, because the provided example scripts contained many antipatterns, such as:
+However, during the course, I personally found it difficult to follow along, because the provided scripts contained a lot of antipatterns, which obscured the logic of scripts that should have otherwise been straightforward. While this may be acceptable for beginner users learning how to code for the first time, it makes the code far less modifiable or reusable. I found myself having to really work at getting each line of code to work. Having to focus most of my time and effort on fixing broken lines of code and fixing library installations took time away from the most important part of the course: learning what the code actually does, learning which algorithms to use, and learning how to improve the visualizations.
 
-1. code duplication
-2. hard-coding: paths, data, column names, etc.
-3. missing references: some lines reference objects instantiated in previous scripts, requiring you to save all your RData when you close RStudio
-4. lack of modularity: data and figures are all input and output into the same directory, making it difficult to figure out which files are used
-5. manual intervention: instead of using `ggsave()` or `png() plot() dev.off()`, the script expects you to run each line in RStudio and use the [Export] button, making figure generation non-deterministic
-6. improper object instantiation: filtered dataframes or data subsets are saved in permanent variables, signaling they might be important, but then they are never used again
-7. lack of abstraction: no examples of writing reusable functions
-8. improper scoping: importing entire tidyverse package prevents you from knowing which package your function comes from
-
-These anti-patterns obscured the logic of scripts that should have otherwise been straightforward. During the course, I found myself having to really work at getting each line of code to work. Having to focus most of my time and effort on fixing broken lines of code and fixing library installations took time away from the most important part of the course: learning what the code actually does, learning which algorithms to use, and learning which visualizations to best display the data.
-
-So in this repo, I meticulously refactored each script in such a way that it should run directly out of the box in your command line if you have the required files and libraries installed. Each script is structured in the following standardized way:
+So in this repo, I meticulously refactored each script in such a way that it should run directly out of the box in your command line if you have the required files and libraries installed. Each script is structured in the following standardized way, so that you know exactly what to expect:
 
 1. imports at the top
 2. command line options after imports
@@ -25,7 +14,7 @@ So in this repo, I meticulously refactored each script in such a way that it sho
 4. data wrangling
 5. output figures
 
-That way, if you have a custom analysis, you should be able to reuse the same script, swap out the data, and make minimal adjustments to do roughly the same analysis.
+That way, if you have a custom analysis, you should be able to reuse the same script, swap out the data, and make minimal adjustments to do roughly the same analysis, and you will be able to copy code chunks to put together a script much like you assemble a castle out of legos.
 
 One caveat is that if you are currently taking DIYTranscriptomics and the assignments are still the same, keep in mind that this repo is NOT meant to be a cheat sheet, even if it generates the figures that are supposed to be "the solution." You will still have to understand the data you're working with. You will still have to manually figure out which subset of the data you're interested in. You will still have to do some work to make your figures look pretty. There is always more to do. This is only meant to make your life a little bit easier, not solve all your problems for you.
 
