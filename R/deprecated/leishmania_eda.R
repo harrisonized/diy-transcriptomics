@@ -28,7 +28,7 @@ option_list = list(
 
     make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
                 metavar="FALSE", type="logical",
-                help="disable if for troubleshooting to prevent overwriting your files")
+                help="enable if troubleshooting to prevent overwriting your files")
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)

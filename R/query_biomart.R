@@ -29,7 +29,7 @@ option_list = list(
 
     make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
                 metavar="FALSE", type="logical",
-                help="disable if for troubleshooting to prevent overwriting your files")
+                help="enable if troubleshooting to prevent overwriting your files")
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
@@ -58,7 +58,7 @@ ref_tx <- dplyr::rename(ref_tx,
                         gene_name = external_gene_name)  # rename columns
 
 # save
-if (troubleshooting==FALSE){
+if (!troubleshooting){
     write.table(
         ref_tx,
         file = file.path(wd, opt['output-dir'][[1]],  # dirpath
@@ -87,7 +87,7 @@ sequences = getSequence(
 sequences <- as_tibble(rev(sequences))
 
 # save
-if (troubleshooting==FALSE){
+if (!troubleshooting){
     write.table(
         sequences,
         file = file.path(wd, opt['output-dir'][[1]],  # dirpath

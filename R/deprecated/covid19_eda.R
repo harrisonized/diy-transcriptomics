@@ -14,13 +14,13 @@ library('logr')
 
 # args
 option_list = list(
-    make_option(c("-s", "--save"), default=TRUE, action="store_false", metavar="TRUE",
-                type="logical", help="disable if you're troubleshooting and don't want to overwrite your files")
+    make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
+                metavar="FALSE", type="logical",
+                help="enable if troubleshooting to prevent overwriting your files")
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-
-save = opt['save'][[1]]  # save=FALSE
+troubleshooting = opt['troubleshooting'][[1]]
 
 # Start Log
 start_time = Sys.time()

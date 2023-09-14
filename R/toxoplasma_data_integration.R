@@ -48,13 +48,13 @@ library('logr')
 
 # args
 option_list = list(
-    make_option(c("-s", "--save"), default=TRUE, action="store_false", metavar="TRUE",
-                type="logical", help="disable if you're troubleshooting and don't want to overwrite your files")
+    make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
+                metavar="FALSE", type="logical",
+                help="enable if troubleshooting to prevent overwriting your files")
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-
-save = opt['save'][[1]]  # save=FALSE
+troubleshooting = opt['troubleshooting'][[1]]
 
 # Start Log
 start_time = Sys.time()
@@ -71,14 +71,14 @@ log_print(paste(Sys.time(), 'Reading data...'))
 # not a fan of this scheme
 load(file.path(wd, 'data', 'toxoplasma', 'spleen.naive.seurat'))
 DimPlot(spleen.naive.seurat, reduction = "umap", split.by = "orig.ident", label = TRUE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'umap_naive.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 load(file.path(wd, 'data', 'toxoplasma', 'spleen.toxoInfected.seurat'))
 DimPlot(spleen.toxoInfected.seurat, reduction = "umap", split.by = "orig.ident", label = TRUE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'umap_infected.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -207,7 +207,7 @@ spleen_integrated <- FindClusters(spleen_integrated, resolution = 0.5)
 log_print(paste(Sys.time(), 'Visualizing...'))
 
 DimPlot(spleen_integrated, reduction = "umap", label = TRUE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'umap_integrated.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -221,7 +221,7 @@ DimPlot(spleen_integrated, reduction = "umap",
         split.by = "treatment", # this facets the plot 
         group.by = "seurat_clusters", # labels the cells with values from your group.by variable
         label = TRUE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'umap_seurat_clusters.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -235,7 +235,7 @@ FeaturePlot(spleen_integrated,
             split.by = "treatment",
             min.cutoff = 'q10',
             label = FALSE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'feature_plot_sdc1.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -250,7 +250,7 @@ FeaturePlot(spleen_integrated,
             split.by = "treatment",
             min.cutoff = 'q10',
             label = FALSE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'feature_plot_cd4_cd8.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -280,7 +280,7 @@ DimPlot(
     group.by = "SingleR.labels", # labels the cells with values from your group.by variable
     label = TRUE
 )
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'umap_singler_labels.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -293,7 +293,7 @@ spleen_integrated <- RenameIdents(spleen_integrated, new.cluster.ids)
 DimPlot(spleen_integrated, reduction = "umap", 
         split.by = "treatment", # this facets the plot 
         label = TRUE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'umap_treatment.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -311,7 +311,7 @@ spleen_integrated.CD4.Tcells <- subset(spleen_integrated, idents = "CD4+ T cells
 #spleen_integrated.CD4.Tcells <- FindNeighbors(spleen_integrated.CD4.Tcells, dims = 1:10, k.param = 5)
 #spleen_integrated.CD4.Tcells <- FindClusters(spleen_integrated.CD4.Tcells)
 DimPlot(spleen_integrated.CD4.Tcells, reduction = "umap", label = TRUE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'umap_cd4_t_cells.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -339,7 +339,7 @@ FeaturePlot(spleen_integrated.CD4.Tcells,
             split.by = "treatment",
             min.cutoff = 'q10',
             label = FALSE)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'toxoplasma', 'feature_plot_ccl5.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }

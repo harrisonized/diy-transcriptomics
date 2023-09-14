@@ -23,13 +23,13 @@ library('logr')
 
 # args
 option_list = list(
-    make_option(c("-s", "--save"), default=TRUE, action="store_false", metavar="TRUE",
-                type="logical", help="disable if you're troubleshooting and don't want to overwrite your files")
+    make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
+                metavar="FALSE", type="logical",
+                help="enable if troubleshooting to prevent overwriting your files")
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-
-save = opt['save'][[1]]  # save=FALSE
+troubleshooting = opt['troubleshooting'][[1]]
 
 # Start Log
 start_time = Sys.time()
@@ -93,7 +93,7 @@ pca.plot <- ggplot(pca.res.df) +
 
 ggplotly(pca.plot)
 
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'pca', 'pca_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -124,7 +124,7 @@ fig <- ggplot(pca.pivot) +
     theme_bw() +
     coord_flip()
 
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'pca', 'pca_small_multiples_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -206,7 +206,7 @@ vplot <- ggplot(myTopHits.df) +
     theme_bw()
 
 ggplotly(vplot)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'volcano_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -222,7 +222,7 @@ results <- decideTests(ebFit, method="global", adjust.method="BH", p.value=0.01,
 # head(results)
 # summary(results)
 vennDiagram(results[, 1:4], include="up")
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'pca', 'venn_diagram.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -251,7 +251,7 @@ datatable(
     ) %>%
     formatRound(columns=c(2:11), digits=2)
 
-if (save==TRUE) {
+if (!troubleshooting) {
     # NOTE: this .txt file can be directly used for input into other clustering or network analysis tools
     # (e.g., String, Clust (https://github.com/BaselAbujamous/clust, etc.)
     write_tsv(diffGenes.df, file.path(wd, 'data', 'malaria', "DiffGenes.txt"))
@@ -270,7 +270,7 @@ module.color <- module.color[as.vector(module.assign)]
 
 
 # plot and save dendrogram
-if (save==TRUE) {
+if (!troubleshooting) {
     # see: http://www.sthda.com/english/wiki/creating-and-saving-graphs-r-base-graphs
     png(file.path(wd, 'figures', 'malaria', 'heatmap.png'))
     heatmap.2(

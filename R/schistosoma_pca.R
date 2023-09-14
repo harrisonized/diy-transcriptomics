@@ -18,13 +18,13 @@ library('logr')
 
 # args
 option_list = list(
-    make_option(c("-s", "--save"), default=TRUE, action="store_false", metavar="TRUE",
-                type="logical", help="disable if you're troubleshooting and don't want to overwrite your files")
+    make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
+                metavar="FALSE", type="logical",
+                help="enable if troubleshooting to prevent overwriting your files")
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-
-save = opt['save'][[1]]  # save=FALSE
+troubleshooting = opt['troubleshooting'][[1]]
 
 # Start Log
 start_time = Sys.time()
@@ -64,7 +64,7 @@ distance <- dist(
 clusters <- hclust(distance, method = "average")
 
 # plot and save dendrogram
-if (save==TRUE) {
+if (!troubleshooting) {
     # see: http://www.sthda.com/english/wiki/creating-and-saving-graphs-r-base-graphs
     png(file.path(wd, 'figures', 'schistosoma', 'pca', 'dendrogram.png'))
     plot(clusters, labels=sampleLabels)
@@ -93,7 +93,7 @@ pca_result <- prcomp(
 
 # A screeplot is a standard way to view eigenvalues for each PCA
 # plot and save screeplot, basically a histogram
-if (save==TRUE) {
+if (!troubleshooting) {
     png(file.path(wd, 'figures', 'schistosoma', 'pca', 'screeplot.png'))
     screeplot(pca_result)
     dev.off()
@@ -117,7 +117,7 @@ fig <- ggplot(pca_result.df) +
          caption=paste0("produced on ", Sys.time())) +
     # coord_fixed() +
     theme_bw()
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'schistosoma', 'pca', 'pca_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -144,7 +144,7 @@ fig2 <- ggplot(pca.pivot) +
          caption=paste0("produced on ", Sys.time())) +
     theme_bw() +
     coord_flip()
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'schistosoma', 'pca', 'pca_small_multiples_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }

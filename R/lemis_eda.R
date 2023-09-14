@@ -14,13 +14,13 @@ library('logr')
 
 # args
 option_list = list(
-    make_option(c("-s", "--save"), default=TRUE, action="store_false", metavar="TRUE",
-                type="logical", help="disable if you're troubleshooting and don't want to overwrite your files")
+    make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
+                metavar="FALSE", type="logical",
+                help="enable if troubleshooting to prevent overwriting your files")
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-
-save = opt['save'][[1]]  # save=FALSE
+troubleshooting = opt['troubleshooting'][[1]]
 
 # Start Log
 start_time = Sys.time()
@@ -85,7 +85,7 @@ fig <- ggplot(
     ylab("total_quantity") +
     ggtitle("Live mammals Imported for Science") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'lemis', 'figure_1-imported_live_mammals.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -103,7 +103,7 @@ fig <- ggplot(agg_tbl[1:10, ], aes(x = reorder(country_origin, -total_quantity),
     geom_bar(stat = "identity") + 
     ggtitle("Countries we import the most macaques") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'lemis', 'figure_2-countries_most_macaques.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -122,7 +122,7 @@ fig <- ggplot(agg_tbl[1:10, ], aes(x = reorder(country_origin, -total_quantity),
     geom_bar(stat = "identity") + 
     ggtitle("Countries we import the most live bats") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'lemis', 'figure_3-countries_most_bats.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -141,7 +141,7 @@ fig <- ggplot(agg_tbl[1:10, ], aes(x = reorder(purpose, -total_quantity), y = to
     geom_bar(stat = "identity") + 
     ggtitle("Purpose that we import the most live bats") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'lemis', 'figure_4-countries_most_bats_purpose.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -161,7 +161,7 @@ fig <- ggplot(agg_tbl, aes(fill=specific_name, y=total_quantity, x=reorder(count
     geom_bar(position="stack", stat="identity") + 
     ggtitle("Types of imported bats from different countries") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'lemis', 'figure_5-imported_bats.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -185,7 +185,7 @@ fig <- ggplot(agg_tbl, aes(fill=specific_name, y=total_quantity, x=reorder(port,
     geom_bar(position="stack", stat="identity") + 
     ggtitle("Types of imported fruit bats from different countries") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'lemis', 'figure_6-imported_fruit_bats.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -208,7 +208,7 @@ fig <- ggplot(agg_tbl, aes(fill=specific_name, y=total_quantity, x=reorder(port,
     geom_bar(position="stack", stat="identity") + 
     ggtitle("Types of imported wildebeests at different ports") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'lemis', 'figure_7-wildebeest-skin.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }

@@ -20,13 +20,13 @@ library('logr')
 
 # args
 option_list = list(
-    make_option(c("-s", "--save"), default=TRUE, action="store_false", metavar="TRUE",
-                type="logical", help="disable if you're troubleshooting and don't want to overwrite your files")
+    make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
+                metavar="FALSE", type="logical",
+                help="enable if troubleshooting to prevent overwriting your files")
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-
-save = opt['save'][[1]]  # save=FALSE
+troubleshooting = opt['troubleshooting'][[1]]
 
 # Start Log
 start_time = Sys.time()
@@ -59,7 +59,7 @@ colnames(txi_gene$counts) <- unlist(lapply(sample_ids, function(x) paste(x, '_co
 colnames(txi_gene$abundance) <- unlist(lapply(sample_ids, function(x) paste(x, '_abundance', sep='')))
 colnames(txi_gene$length) <- unlist(lapply(sample_ids, function(x) paste(x, '_length', sep='')))
 
-if (save==TRUE) {
+if (!troubleshooting) {
     log_print(paste(Sys.time(), 'Saving txi files...'))
     if (!dir.exists(file.path(wd, 'data', 'malaria', 'txi'))) {
         dir.create(file.path(wd, 'data', 'malaria', 'txi'), recursive=TRUE)
@@ -111,7 +111,7 @@ p1 <- ggplot(log2.cpm.df.pivot) +
        caption=paste0("produced on ", Sys.time())) +
   theme_bw()
 
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'eda', 'cpm_unfiltered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -148,7 +148,7 @@ p2 <- ggplot(log2.cpm.filtered.df.pivot) +
         caption=paste0("produced on ", Sys.time())) +
     theme_bw()
 
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'eda', 'cpm_filtered_nonnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -166,7 +166,7 @@ log2.cpm.filtered.norm.df.pivot <- pivot_longer(log2.cpm.filtered.norm.df, # dat
                                                 names_to = "samples", # name of that new variable (column)
                                                 values_to = "expression") # name of new variable (column) storing all the values (data)
 
-if (save==TRUE) {
+if (!troubleshooting) {
     log_print(paste(Sys.time(), 'Saving filtered, normalized cpm...'))
     write.table(
         log2.cpm.filtered.norm,
@@ -190,7 +190,7 @@ p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
          caption=paste0("produced on ", Sys.time())) +
     theme_bw()
 
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'eda', 'tpm_filtered_normalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -199,7 +199,7 @@ if (save==TRUE) {
 # Plot all violins together
 log_print(paste(Sys.time(), 'Plotting cowplot...'))
 cowplot::plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
-if (save==TRUE) {
+if (!troubleshooting) {
     ggsave(file.path(wd, 'figures', 'malaria', 'eda', 'cowplot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
