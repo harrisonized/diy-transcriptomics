@@ -1,14 +1,17 @@
-## This was Step3_multivariate.R
+## Adapted from: Step3_multivariate.R
+## Requires filtered_normalized_cpm.csv
+## Performs PCA and plots the dendrogram
+## Then, there are examples from gt, DT, and plotly
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 source(file.path(wd, 'R', 'utils.R'))
 # library(tidyverse) # too broad
 library('tibble')
 library('tidyr')
-library('dplyr')
-library('gt') # publication quality tables
-library('DT') # for making interactive tables
-library('plotly')
+suppressMessages(library('dplyr'))
+library('gt')  # publication quality tables
+library('DT')  # interactive tables
+suppressMessages(library('plotly'))
 library('optparse')
 library('logr')
 
@@ -18,6 +21,14 @@ library('logr')
 
 # args
 option_list = list(
+    make_option(c("-i", "--input-file"), default="data/schistosoma/filtered_normalized_cpm.csv",
+                metavar="data/schistosoma/filtered_normalized_cpm.csv", type="character",
+                help="path/to/filtered_normalized_cpm.csv"),
+
+    make_option(c("-o", "--output-dir"), default="figures/schistosoma",
+                metavar="figures/schistosoma", type="character",
+                help="set the output directory for the figures"),
+
     make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
                 metavar="FALSE", type="logical",
                 help="enable if troubleshooting to prevent overwriting your files")
@@ -35,79 +46,71 @@ log_print(paste('Script started at:', start_time))
 # ----------------------------------------------------------------------
 # Read in data
 
+# cpm
+cpm_data <- readr::read_csv(file.path(wd, opt['input-file'][[1]]))
+sample_ids <- colnames(cpm_data[, 2:ncol(cpm_data)])
 
-# From eda.R
-log2.cpm.filtered.norm.df <- readr::read_csv(
-    file.path(wd, 'data', 'schistosoma', "filtered_normalized_cpm.csv")
-)
-columns <- colnames(log2.cpm.filtered.norm.df)
-sampleLabels <- columns[c(2:length(columns))]
-
-
-# Read in study design file
-# do we really need this?
 study_design <- readr::read_tsv(file.path(wd, 'data', 'schistosoma', "studyDesign.txt"))
-group <- study_design$sex
-group <- factor(group)
-timpoint <- study_design$timpoint
+group <- factor(study_design[['sex']])
 
 
 # ----------------------------------------------------------------------
 # Hierarchical Clustering
 
+log_print(paste(Sys.time(), 'Hierarchical clustering...'))
+
 # distance methods: "euclidean", maximum", "manhattan", "canberra", "binary", "minkowski"
 # agg methods: "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"
-distance <- dist(
-    t(log2.cpm.filtered.norm.df[, !names(log2.cpm.filtered.norm.df)=='gene_ID']),
+distances <- dist(
+    t(cpm_data[, !names(cpm_data)=='target_id']),
     method = "maximum"
 )
-clusters <- hclust(distance, method = "average")
+clusters <- hclust(distances, method = "average")
 
-# plot and save dendrogram
+# plot dendrogram
 if (!troubleshooting) {
     # see: http://www.sthda.com/english/wiki/creating-and-saving-graphs-r-base-graphs
-    png(file.path(wd, 'figures', 'schistosoma', 'pca', 'dendrogram.png'))
-    plot(clusters, labels=sampleLabels)
+    png(file.path(wd, opt['output-dir'][[1]], 'pca', 'dendrogram.png'))
+    plot(clusters, labels=sample_ids)
     dev.off()
 }
-
 
 
 # ----------------------------------------------------------------------
 # Perform PCA
 
+log_print(paste(Sys.time(), 'Perform PCA clustering...'))
+
 # pca_result
+# See: https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/prcomp
+# rotation: how much each sample influenced each PC (aka 'loadings')
+# x: how much each gene influenced each PC (aka 'scores')
+# sdev
+# center, scale
+# summary(pca_result)
 pca_result <- prcomp(
-    t(log2.cpm.filtered.norm.df[, !names(log2.cpm.filtered.norm.df)=='gene_ID']),
-    scale.=F, retx=T
+    t(cpm_data[, !names(cpm_data)=='target_id']),
+    scale.=FALSE, retx=TRUE
 )
 
 # Inspect
 # ls(pca_result)
-# "center"
-# "rotation": how much each gene influenced each PC (aka 'scores')
-# "scale"
-# "sdev"
-# "x": how much each sample influenced each PC (aka 'loadings'), note that these have a magnitude and a direction
-# summary(pca_result)
 
-# A screeplot is a standard way to view eigenvalues for each PCA
-# plot and save screeplot, basically a histogram
+# Plot eigenvalues for each PC
 if (!troubleshooting) {
-    png(file.path(wd, 'figures', 'schistosoma', 'pca', 'screeplot.png'))
+    png(file.path(wd, opt['output-dir'][[1]], 'pca', 'screeplot.png'))
     screeplot(pca_result)
     dev.off()
 }
 
-# compute percentage variance explained by each principal component
-variance <- pca_result$sdev^2  # sdev^2 captures these eigenvalues from the PCA result
+# Compute percentage variance explained by each PC
+variance <- pca_result[['sdev']]^2  # sdev^2 captures these eigenvalues from the PCA result
 pct_variance <- round(variance/sum(variance)*100, 1)
 
-
 # Plot the first two PCs
-pca_result.df <- as_tibble(pca_result$x)
-fig <- ggplot(pca_result.df) +
-    aes(x=PC1, y=PC2, label=sampleLabels) +
+pca_scores <- as_tibble(pca_result[['x']])
+fig <- ggplot(pca_scores) +
+    aes(x=PC1, y=PC2, label=sample_ids) +
     geom_point(size=4) +
     # geom_label() +
     # stat_ellipse() +
@@ -117,26 +120,30 @@ fig <- ggplot(pca_result.df) +
          caption=paste0("produced on ", Sys.time())) +
     # coord_fixed() +
     theme_bw()
+
 if (!troubleshooting) {
-    ggsave(file.path(wd, 'figures', 'schistosoma', 'pca', 'pca_plot.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'pca_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 
 # ----------------------------------------------------------------------
-# Create a PCA 'small multiples' chart
+# Plot "small multiples" chart
 
-pca_result.df <- pca_result$x[,1:4] %>%
+pca_scores <- pca_result[['x']][,1:4] %>%
   as_tibble() %>%
-  add_column(sample = sampleLabels,
+  add_column(sample = sample_ids,
              group = group)
-  
-pca.pivot <- pivot_longer(pca_result.df, # dataframe to be pivoted
-                          cols = PC1:PC4, # column names to be stored as a SINGLE variable
-                          names_to = "PC", # name of that new variable (column)
-                          values_to = "loadings") # name of new variable (column) storing all the values (data)
 
-fig2 <- ggplot(pca.pivot) +
+# reshape for plotting
+pca_scores_long <- pivot_longer(
+    pca_scores,
+    cols = PC1:PC4,
+    names_to = "PC",
+    values_to = "loadings"
+)
+
+fig2 <- ggplot(pca_scores_long) +
     aes(x=sample, y=loadings, fill=group) +
     geom_bar(stat="identity") +
     facet_wrap(~PC) +
@@ -145,7 +152,7 @@ fig2 <- ggplot(pca.pivot) +
     theme_bw() +
     coord_flip()
 if (!troubleshooting) {
-    ggsave(file.path(wd, 'figures', 'schistosoma', 'pca', 'pca_small_multiples_plot.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'pca_small_multiples_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -153,97 +160,103 @@ if (!troubleshooting) {
 # ----------------------------------------------------------------------
 # Examples using dplyr
 
-mydata.df <- log2.cpm.filtered.norm.df %>% 
-    mutate(mctl.AVG = (MCtl_LEPZQ_1 + MCtl_LEPZQ_2 + MCtl_LEPZQ_3)/3,
-           fctl.AVG = (FCtl_LEPZQ_1 + FCtl_LEPZQ_2 + FCtl_LEPZQ_3)/3,
-           LogFC = (mctl.AVG - fctl.AVG)) %>% 
-    mutate_if(is.numeric, round, 2)
+cpm_agg <- cpm_data %>% 
+    mutate(male_ctl_avg = (MCtl_LEPZQ_1 + MCtl_LEPZQ_2 + MCtl_LEPZQ_3)/3,
+           female_ctl_avg = (FCtl_LEPZQ_1 + FCtl_LEPZQ_2 + FCtl_LEPZQ_3)/3,
+           log_fold_change = (male_ctl_avg - female_ctl_avg)) %>% 
+    mutate_if(is.numeric, round, 2) %>%
+    arrange(desc(log_fold_change)) %>% 
+    dplyr::select(target_id, male_ctl_avg, female_ctl_avg, log_fold_change)
 
-mydata.sort <- mydata.df %>%
-    arrange(desc(LogFC)) %>% 
-    dplyr::select(gene_ID, LogFC)
-
-
-# Filter examples
-# BUG: there are no gene names in the data, so this filters out everything
-# gene_id = Smp_186980.1 , ...
-mydata.filter <- mydata.df %>%
-    dplyr::filter(
-        gene_ID=="MMP1" | gene_ID=="GZMB" | gene_ID=="IL1B" | gene_ID=="GNLY" | gene_ID=="IFNG" |
-        gene_ID=="CCL4" | gene_ID=="PRF1" | gene_ID=="APOBEC3A" | gene_ID=="UNC13A"
-    ) %>%
-    dplyr::select(gene_ID, mctl.AVG, fctl.AVG, LogFC) %>%
-    arrange(desc(LogFC))
+# Example of filtering
+target_ids <- c("Smp_017610.1", "Smp_197050.1", "Smp_160500.1", "Smp_160490.1", "Smp_070540.1")
+cpm_subset <- cpm_agg %>%
+    dplyr::filter(target_id %in% target_ids) %>%
+    dplyr::select(target_id, male_ctl_avg, female_ctl_avg, log_fold_change) %>%
+    arrange(desc(log_fold_change))
 
 # you can also filter based on any regular expression
-mydata.grep <- mydata.df %>%
-    dplyr::filter(grepl('CXCL|IFI', gene_ID)) %>%
-    dplyr::select(gene_ID, mctl.AVG, fctl.AVG, LogFC) %>%
-    arrange(desc(gene_ID))
+# cpm_subset <- cpm_agg %>%
+#     dplyr::filter(grepl('Smp_017[[:digit:]]+', target_id)) %>%
+#     dplyr::select(target_id, male_ctl_avg, female_ctl_avg, log_fold_change) %>%
+#     arrange(desc(target_id))
 
 
 # ----------------------------------------------------------------------
 # gt table example
 
-gt_table_1 <- gt(mydata.df[1:50, ])
+gt_table_1 <- gt(cpm_subset)
 gtsave(gt_table_1,
        'gt_example_1.png',
-       path=file.path(wd, 'figures', 'schistosoma')
+       path=file.path(wd, opt['output-dir'][[1]])
 )
 
-gt_table_2 <- mydata.df[1:50, ] %>%
+gt_table_2 <- cpm_subset %>%
     gt() %>%
-    fmt_number(columns=2:4, decimals = 1) %>%
+    fmt_number(columns=1:3, decimals = 1) %>%
     tab_header(title = md("**Regulators of skin pathogenesis**"),
                subtitle = md("*during cutaneous leishmaniasis*")) %>%
     tab_footnote(
         footnote = "Deletion or blockaid ameliorates disease in mice",
         locations = cells_body(
-        columns = gene_ID,
-        rows = c(6, 7))) %>% 
+        columns = target_id,
+        rows = c(4, 5))) %>% 
     tab_footnote(
         footnote = "Associated with treatment failure in multiple studies",
         locations = cells_body(
-        columns = gene_ID,
-        rows = c(2:9))) %>%
+        columns = target_id,
+        rows = c(2:5))) %>%
     tab_footnote(
         footnote = "Implicated in parasite control",
         locations = cells_body(
-        columns = gene_ID,
+        columns = target_id,
         rows = c(2))) %>%
     tab_source_note(
         source_note = md("Reference: Amorim *et al*., (2019). DOI: 10.1126/scitranslmed.aar3619"))
-gtsave(gt_table_2,
-       'gt_example_2.png',
-       path=file.path(wd, 'figures', 'schistosoma')
-)
+if (!troubleshooting) {
+    gtsave(gt_table_2,
+           'gt_example_2.png',
+           path=file.path(wd, opt['output-dir'][[1]])
+    )
+}
 
 
 # ----------------------------------------------------------------------
 # Searchable table example
 
-DT::datatable(mydata.df[,c(1,12:14)], 
-          extensions = c('KeyTable', "FixedHeader"), 
-          filter = 'top',
-          options = list(keys = TRUE, 
-                         searchHighlight = TRUE, 
-                         pageLength = 10, 
-                         #dom = "Blfrtip", 
-                         #buttons = c("copy", "csv", "excel"),
-                         lengthMenu = c("10", "25", "50", "100")))
+DT::datatable(
+    cpm_agg, 
+    extensions = c('KeyTable', "FixedHeader"), 
+    filter = 'top',
+    options = list(keys = TRUE, 
+                   searchHighlight = TRUE, 
+                   pageLength = 10, 
+                   #dom = "Blfrtip", 
+                   #buttons = c("copy", "csv", "excel"),
+                   lengthMenu = c("10", "25", "50", "100"))
+)
+# Warning message:
+# In instance$preRenderHook(instance) :
+#   It seems your data is too big for client-side DataTables.
+#   You may consider server-side processing: https://rstudio.github.io/DT/server.html
+
 
 # ----------------------------------------------------------------------
 # Plotly example
 
-fig <- ggplot(mydata.df) +
-  aes(x=mctl.AVG, y=fctl.AVG, 
-      text = paste("Symbol:", gene_ID)) +
+fig <- ggplot(cpm_agg) +
+  aes(x=male_ctl_avg, y=female_ctl_avg, 
+      text = paste("Symbol:", target_id)) +
   geom_point(shape=16, size=1) +
   ggtitle("disease vs. healthy") +
   theme_bw()
 
 ggplotly(fig)
 
+if (!troubleshooting) {
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'plotly_scatter_example.png'),
+           height=750, width=1200, dpi=300, units="px", scaling=0.5)
+}
 
 
 end_time = Sys.time()

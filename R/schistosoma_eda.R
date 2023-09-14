@@ -1,6 +1,7 @@
 ## Adapted from: Step1_TxImport.R, Step2_dataWrangling
 ## Concatenates the abundance files in the schistosoma dataset and creates some violin plots
-## Note that this contains code duplication. However, that is acceptable here, because this is only EDA
+## Note that this contains code duplication. However, that is acceptable here, because this is only EDA.
+## Outputs filtered_normalized_cpm.csv, which is required for shistosoma_pca.R
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 # library(tidyverse)  # too broad
@@ -115,9 +116,9 @@ if (!troubleshooting) {
 
 
 # ----------------------------------------------------------------------
-# Unfiltered, non-normalized abundance (tpm)
+# Raw abundance (tpm)
 
-log_print(paste(Sys.time(), 'Plotting unfiltered, non-normalized abundance...'))
+log_print(paste(Sys.time(), 'Plotting raw abundance...'))
 
 # Add SD, AVG, and MED as columns to the abundances matrix
 abundance_matrix = as.matrix(txi[['abundance']][, !(colnames(txi[['abundance']]) %in% c('SD', 'AVG', 'MED'))])
@@ -135,14 +136,14 @@ fig <- ggplot(txi[['abundance']]) +
     geom_hex(show.legend = FALSE) +
     labs(y="Median", x = "Standard deviation",
          title="Transcripts per million (TPM)",
-         subtitle="unfiltered, non-normalized data",
+         subtitle="unfiltered, unnormalized data",
          caption="DIYtranscriptomics - Spring 2020") +
     theme_classic() +
     theme_dark() + 
     theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_unfiltered_nonnormalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_unfiltered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -160,12 +161,12 @@ if (FALSE) {
 
 
 # ----------------------------------------------------------------------
-# Unfiltered, non-normalized log2 counts (cpm)
+# Raw log2 counts (cpm)
 
-log_print(paste(Sys.time(), 'Plotting unfiltered, non-normalized log2 counts...'))
+log_print(paste(Sys.time(), 'Plotting raw log2 counts...'))
 
-cpm_wide <- as_tibble(cpm(dge_list, log=TRUE), rownames = "geneID")
-colnames(cpm_wide) <- c("geneID", sample_ids)
+cpm_wide <- as_tibble(cpm(dge_list, log=TRUE), rownames = "target_id")
+colnames(cpm_wide) <- c("target_id", sample_ids)
 
 # reshape for plotting
 cpm_long <- pivot_longer(
@@ -185,25 +186,25 @@ p1 <- ggplot(cpm_long) +
                show.legend = FALSE) +
   labs(y="log2 expression", x = "sample",
        title="Log2 Counts per Million (CPM)",
-       subtitle="unfiltered, non-normalized",
+       subtitle="unfiltered, unnormalized",
        # caption=paste0("produced on ", Sys.time())
        ) +
   theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cpm_unfiltered_nonnormalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cpm_unfiltered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 
 # ----------------------------------------------------------------------
-# Filtered, non-normalized log2 counts (cpm)
+# Filtered log2 counts (cpm)
 
-log_print(paste(Sys.time(), 'Plotting filtered, non-normalized log2 counts...'))
+log_print(paste(Sys.time(), 'Plotting filtered log2 counts...'))
 
 dge_subset <- dge_list[rowSums(cpm_wide>1)>=5,]
-cpm_wide <- as_tibble(cpm(dge_subset, log=TRUE), rownames = "geneID")
-colnames(cpm_wide) <- c("geneID", sample_ids)
+cpm_wide <- as_tibble(cpm(dge_subset, log=TRUE), rownames = "target_id")
+colnames(cpm_wide) <- c("target_id", sample_ids)
 
 # reshape for plotting
 cpm_long <- pivot_longer(
@@ -224,13 +225,13 @@ p2 <- ggplot(cpm_long) +
                  show.legend = FALSE) +
     labs(y="log2 expression", x = "sample",
         title="Log2 Counts per Million (CPM)",
-        subtitle="filtered, non-normalized",
+        subtitle="filtered, unnormalized",
         caption=paste0("produced on ", Sys.time())) +
     theme_bw()
     # coord_flip()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_filtered_nonnormalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_filtered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -241,10 +242,12 @@ if (!troubleshooting) {
 log_print(paste(Sys.time(), 'Plotting filtered, normalized log2 counts...'))
 
 dge_subset_norm <- calcNormFactors(dge_subset, method = "TMM")
-cpm_norm_wide <- as_tibble(cpm(dge_subset_norm, log=TRUE), rownames = "gene_ID")
-colnames(cpm_norm_wide) <- c("gene_ID", sample_ids)
-colnames(cpm_norm_wide) <- c("geneID", sample_ids)
+cpm_norm_wide <- as_tibble(cpm(dge_subset_norm, log=TRUE), rownames = "target_id")
+colnames(cpm_norm_wide) <- c("target_id", sample_ids)
+
+# required for schistosoma_pca.R
 if (!troubleshooting) {
+    log_print(paste(Sys.time(), 'Saving filtered_normalized_cpm.csv ...'))
     write.table(
         cpm_norm_wide,
         file.path(wd, dirname(opt['input-dir'][[1]]), 'filtered_normalized_cpm.csv'),
