@@ -12,7 +12,7 @@ Some of the antipatterns you will see in these scripts are listed here:
 8. improper scoping: importing entire tidyverse package prevents you from knowing which package your function comes from
 9. improper variable names: name your variables something descriptive and searchable
 
-It is important that when you learn how to code for yourself, you try your best to avoid emulating these antipatterns. If you find yourself pressed for time and have to use an antipattern, always go back and fix it after the deadline, as a sort of cleanup.
+It is important that when you learn how to code for yourself, you try your best to avoid emulating these antipatterns. If you find yourself pressed for time and have to use an antipattern, always go back and clean it up after the deadline. This allows you to prevent accumulating technical debt, which if left unaddressed, will eventually cause you to never use your code again.
 
 As for how to produce cleaner code, just like writing an essay, you need to find a style that works for you. There is no single "right way." The most important thing is to be consistent. Here are a few tips to help you get started:
 
