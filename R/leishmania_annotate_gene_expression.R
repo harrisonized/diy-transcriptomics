@@ -9,7 +9,7 @@ suppressMessages(library('EnsDb.Hsapiens.v86'))
 suppressMessages(library('GenomicFeatures'))
 library('optparse')
 library('logr')
-source(file.path(wd, 'R', 'utils.R'))    # list_files, filter_list_for_match
+source(file.path(wd, 'R', 'utils.R'))  # list_files, filter_list_for_match
 
 
 # ----------------------------------------------------------------------
@@ -35,7 +35,8 @@ troubleshooting = opt['troubleshooting'][[1]]
 
 # Start Log
 start_time = Sys.time()
-log <- log_open(paste("eda ", start_time, '.log', sep=''))
+log <- log_open(paste0("leishmania_annotate_gene_expression-",
+                       strftime(start_time, format="%Y%m%d_%H%M%S"), '.log'))
 log_print(paste('Script started at:', start_time))
 
 

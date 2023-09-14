@@ -1,9 +1,9 @@
+## Source: Step1_TxImport.R, Step2_dataWrangling
 ## 1. Concat data
 ## 2. Filter and normalization
 ## 3. Plot
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-source(file.path(wd, 'R', 'utils.R'))
 # library(tidyverse)  # too broad
 library('readr')  # read_tsv
 library('tibble')  # as_tibble
@@ -17,6 +17,7 @@ suppressMessages(library('EnsDb.Hsapiens.v86'))
 suppressMessages(library('edgeR'))  # DGElist, cpm
 library('optparse')
 library('logr')
+source(file.path(wd, 'R', 'utils.R'))  # list_files, filter_list_for_match
 
 
 # ----------------------------------------------------------------------
@@ -24,6 +25,15 @@ library('logr')
 
 # args
 option_list = list(
+
+    make_option(c("-i", "--input-dir"), default="data/schistosoma/mapped_reads",
+                metavar="data/leishmania/mapped_reads", type="character",
+                help="set the input directory"),
+
+    make_option(c("-f", "--file-ext"), default="h5",
+                metavar="h5", type="character",
+                help="Choose: 'h5' or 'tsv'. 'h5' is faster for importing data"),
+
     make_option(c("-s", "--save"), default=TRUE, action="store_false", metavar="TRUE",
                 type="logical", help="disable if you're troubleshooting and don't want to overwrite your files")
 )
@@ -34,7 +44,7 @@ save = opt['save'][[1]]  # save=FALSE
 
 # Start Log
 start_time = Sys.time()
-log <- log_open(paste("eda ", start_time, '.log', sep=''))
+log <- log_open(paste0("schistosoma_eda-", strftime(start_time, format="%Y%m%d_%H%M%S"), '.log'))
 log_print(paste('Script started at:', start_time))
 
 
@@ -45,9 +55,11 @@ log_print(paste('Script started at:', start_time))
 log_print(paste(Sys.time(), 'Reading files...'))
 
 # get human annotations
-Tx <- as_tibble(transcripts(EnsDb.Hsapiens.v86, columns=c("tx_id", "gene_name")))
-Tx <- dplyr::rename(Tx, target_id = tx_id)  #need to change first column name to 'target_id'
-Tx <- dplyr::select(Tx, "target_id", "gene_name")  #transcript ID needs to be the first column in the dataframe
+tx2gene_obj <- as_tibble(
+    GenomicFeatures::transcripts('EnsDb.Hsapiens.v86', columns=c("tx_id", "gene_name"))
+)
+tx2gene_obj <- dplyr::rename(tx2gene_obj, target_id = tx_id)  #need to change first column name to 'target_id'
+tx2gene_obj <- dplyr::select(tx2gene_obj, "target_id", "gene_name")  #transcript ID needs to be the first column in the dataframe
 
 # Example file: "data/schistosoma/mapped_reads/F12h_LE_1/abundance.tsv"
 #   target_id    length eff_length est_counts   tpm
@@ -72,11 +84,13 @@ abundance_filepaths = filter_list_for_match(
 txi <- tximport(
     abundance_filepaths,
     type = "kallisto", 
-    tx2gene = Tx, 
+    tx2gene = tx2gene_obj, 
     txOut = TRUE,  # doesn't work when this is FALSE
     countsFromAbundance = "lengthScaledTPM",
     ignoreTxVersion = TRUE
 )
+
+
 # update column names, they're not included
 sample_ids = unlist(lapply(abundance_filepaths, function(x) basename(dirname(x))))
 colnames(txi$counts) <- unlist(lapply(sample_ids, function(x) paste(x, '_count', sep='')))

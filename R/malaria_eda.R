@@ -30,7 +30,7 @@ save = opt['save'][[1]]  # save=FALSE
 
 # Start Log
 start_time = Sys.time()
-log <- log_open(paste("eda ", start_time, '.log', sep=''))
+log <- log_open(paste0("malaria_eda-", strftime(start_time, format="%Y%m%d_%H%M%S"), '.log'))
 log_print(paste('Script started at:', start_time))
 
 
