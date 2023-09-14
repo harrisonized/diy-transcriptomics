@@ -3,7 +3,7 @@
 ## using 'EnsDb.Hsapiens.v86' to annotate each row of the resulting dataframe.
 ## No outputs, run this in RStudio
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(dirname(this.path::here()))  # wd = '~/github/diy-transcriptomics'
 suppressMessages(library('EnsDb.Hsapiens.v86'))
 # suppressMessages(library('BSgenome.Mfuro.UCSC.musFur1'))
 suppressMessages(library('GenomicFeatures'))
@@ -35,30 +35,34 @@ troubleshooting = opt['troubleshooting'][[1]]
 
 # Start Log
 start_time = Sys.time()
-log <- log_open(paste0("leishmania_annotate_gene_expression-",
+log <- log_open(paste0("leishmania_eda-",
                        strftime(start_time, format="%Y%m%d_%H%M%S"), '.log'))
 log_print(paste('Script started at:', start_time))
 
 
 # ----------------------------------------------------------------------
-# Import Kallisto data
+# Read Data
 
-# define data sources
+# define data source
 files = filter_list_for_match(
     list_files(file.path(wd, opt['input-dir'][[1]])),
     opt['file-ext'][[1]]  # file_ext
 )
 tx2gene_obj <- GenomicFeatures::transcripts(EnsDb.Hsapiens.v86, columns=c("tx_id", "gene_name"))
 
-# annotate, returns a list of dataframes
 sample_txi <- tximport::tximport(
     files,  # load data from mapped_reads
     type = "kallisto", 
-    tx2gene = tx2gene_obj,
+    tx2gene = tx2gene_obj,  # use EnsDb.Hsapiens.v86 to annotate the data
     txOut = TRUE,  # if this is false, it doesn't work
     countsFromAbundance = "lengthScaledTPM",
     ignoreTxVersion = TRUE
 )
+
+# ----------------------------------------------------------------------
+# Peform EDA here
+
+
 
 end_time = Sys.time()
 log_print(paste('Script ended at:', Sys.time()))

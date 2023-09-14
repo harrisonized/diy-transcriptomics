@@ -1,11 +1,10 @@
 # See: https://diytranscriptomics.com/lab/lab-10
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-source(file.path(wd, 'R', 'utils.R'))
+wd = dirname(dirname(this.path::here()))  # wd = '~/github/diy-transcriptomics'
 # library(tidyverse) # too broad
 library('readr')
 library('textshape')
-library('ggplot2')
+# library('ggplot2')
 library('optparse')
 library('logr')
 
@@ -25,7 +24,7 @@ save = opt['save'][[1]]  # save=FALSE
 
 # Start Log
 start_time = Sys.time()
-log <- log_open(paste0("codiv19_eda-", strftime(start_time, format="%Y%m%d_%H%M%S"), '.log'))
+log <- log_open(paste0("covid19_eda-", strftime(start_time, format="%Y%m%d_%H%M%S"), '.log'))
 log_print(paste('Script started at:', start_time))
 
 
