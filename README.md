@@ -268,8 +268,9 @@ Listed in chronological order:
 | 8 | Lab 7 | R/lemis_eda.R | EDA on the lemis dataset. |
 | 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
 | 10 | Lab 9 | R/malaria_pca.R | Performs PCA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
-| 11 | Lab 10 | R/covid19\_eda.R | Starter script for EDA on the covid19 dataset. |
-| 12 | Lecture 14 | R/covid19\_scrnaseq\_clustering.R | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
-| 13 | Lecture 14 | R/covid19\_scrnaseq\_seurat.R | scRNAseq analysis on covid19_scrnaseq dataset. Plots a UMAP and finds cluster-specific genes. |
-| 14 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. |
-| 15 | Lecture 10 | R/malaria\_functional\_enrichment.R | This is the only script that has not been addressed, because it was skipped during the main course. |
+| 11 | Lab 9 | R/malaria_deg_analysis.R | Performs differential gene expression analysis on the malaria dataset. |
+| 12 | Lab 10 | R/covid19\_eda.R | Starter script for EDA on the covid19 dataset. |
+| 13 | Lecture 14 | R/covid19\_scrnaseq\_clustering.R | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
+| 14 | Lecture 14 | R/covid19\_scrnaseq\_seurat.R | scRNAseq analysis on covid19_scrnaseq dataset. Plots a UMAP and finds cluster-specific genes. |
+| 15 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. |
+| 16 | Lecture 10 | R/malaria\_functional\_enrichment.R | This is the only script that has not been addressed, because it was skipped during the main course. |

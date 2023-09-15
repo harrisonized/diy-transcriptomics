@@ -29,6 +29,10 @@ option_list = list(
                 metavar="abundance.h5", type="character",
                 help="Choose: 'abundance.h5' or 'abundance.tsv'. '.h5' is faster for importing data"),
 
+    make_option(c("-m", "--metadata"), default="data/malaria/studyDesign.txt",
+                metavar="data/malaria/studyDesign.txt", type="character",
+                help="path/to/study_design.txt file"),
+
     make_option(c("-o", "--output-dir"), default="figures/malaria",
                 metavar="figures/malaria", type="character",
                 help="set the output directory for the figures"),
@@ -102,8 +106,8 @@ if (!troubleshooting) {
 }
 
 # metadata
-targets <- read_tsv(file.path(wd, 'data', 'malaria', "studyDesign.txt"))
-sample_ids <- targets$sample
+study_design <- read_tsv(file.path(wd, opt['metadata'][[1]]))
+sample_ids <- study_design[['sample']]
 
 
 # ----------------------------------------------------------------------

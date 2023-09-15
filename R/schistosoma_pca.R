@@ -5,11 +5,13 @@
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 # library(tidyverse) # too broad
+library('readr')
 library('tibble')
 library('tidyr')
 suppressMessages(library('dplyr'))
 library('gt')  # publication quality tables
 library('DT')  # interactive tables
+suppressMessages(library('ggplot2'))
 suppressMessages(library('plotly'))
 library('optparse')
 library('logr')
@@ -45,11 +47,13 @@ log_print(paste('Script started at:', start_time))
 # ----------------------------------------------------------------------
 # Read in data
 
-# cpm
-cpm_data <- readr::read_csv(file.path(wd, opt['input-file'][[1]]))
+log_print(paste(Sys.time(), 'Reading data...'))
+
+# From eda.R
+cpm_data <- read_csv(file.path(wd, opt['input-file'][[1]]))
 sample_ids <- colnames(cpm_data[, 2:ncol(cpm_data)])
 
-study_design <- readr::read_tsv(file.path(wd, 'data', 'schistosoma', "studyDesign.txt"))
+study_design <- read_tsv(file.path(wd, 'data', 'schistosoma', "studyDesign.txt"))
 group <- factor(study_design[['sex']])
 
 
@@ -108,7 +112,7 @@ pct_variance <- round(variance/sum(variance)*100, 1)
 
 # Plot the first two PCs
 pca_scores <- as_tibble(pca_result[['x']])
-fig <- ggplot(pca_scores) +
+pca_plot <- ggplot(pca_scores) +
     aes(x=PC1, y=PC2, label=sample_ids) +
     geom_point(size=4) +
     # geom_label() +
@@ -129,6 +133,9 @@ if (!troubleshooting) {
 # ----------------------------------------------------------------------
 # Plot "small multiples" chart
 
+log_print(paste(Sys.time(), "Plotting 'small multiples' chart..."))
+
+# this is another way to view PCA laodings to understand impact of each sample on each pricipal component
 pca_scores <- pca_result[['x']][,1:4] %>%
   as_tibble() %>%
   add_column(sample = sample_ids,
@@ -137,12 +144,13 @@ pca_scores <- pca_result[['x']][,1:4] %>%
 # reshape for plotting
 pca_scores_long <- pivot_longer(
     pca_scores,
-    cols = PC1:PC4,
-    names_to = "PC",
-    values_to = "loadings"
+    cols = PC1:PC4,  # column names to be stored as a SINGLE variable
+    names_to = "PC",  # name of that new variable (column)
+    values_to = "loadings"  # name of new variable (column) storing all the values (data)
 )
 
-fig2 <- ggplot(pca_scores_long) +
+# you could iteratively 'paint' different covariates onto this plot using the 'fill' aes
+fig <- ggplot(pca_scores_long) +
     aes(x=sample, y=loadings, fill=group) +
     geom_bar(stat="identity") +
     facet_wrap(~PC) +
@@ -150,6 +158,7 @@ fig2 <- ggplot(pca_scores_long) +
          caption=paste0("produced on ", Sys.time())) +
     theme_bw() +
     coord_flip()
+
 if (!troubleshooting) {
     ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'pca_small_multiples_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
