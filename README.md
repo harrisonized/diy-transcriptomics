@@ -6,7 +6,7 @@ This is where I followed along Daniel Beiting's RNA-seq data analysis course. In
 
 However, during the course, I personally found it difficult to follow along, because the provided scripts contained a lot of antipatterns, which obscured the logic of scripts that should have otherwise been straightforward. While this may be acceptable for beginner users learning how to code for the first time, it makes the code far less modifiable or reusable. I found myself having to really work at getting each line of code to work. Having to focus most of my time and effort on fixing broken lines of code and fixing library installations took time away from the most important part of the course: learning what the code actually does, learning which algorithms to use, and learning how to improve the visualizations.
 
-So in this repo, I meticulously refactored each script in such a way that it should run directly out of the box in your command line if you have the required files and libraries installed. Each script is structured in the following standardized way, so that you know exactly what to expect:
+After the class ended, I still wanted to make sure I made it through every aspect of the class. Therefore, in this repo, I meticulously rewrote each script in such a way that it runs in the terminal directly out of the box. Major sections are demarcated by log messages so that there is feedback as the code runs, and these major sections are standardized so you know exactly what to expect:
 
 1. imports at the top
 2. command line options after imports
@@ -14,7 +14,7 @@ So in this repo, I meticulously refactored each script in such a way that it sho
 4. data wrangling
 5. output figures
 
-That way, if you have a custom analysis, you should be able to reuse the same script, swap out the data, and make minimal adjustments to do roughly the same analysis, and you will be able to copy code chunks to put together a script, much like you can assemble a castle out of legos.
+That way, if you have a custom analysis, you should be able to reuse the same script, swap out the data, and make minimal adjustments to do roughly the same analysis. Furthermore, you will be able to copy code chunks to quickly put together custom scripts, much like you can assemble a castle out of legos. 
 
 One caveat is that if you are currently taking DIYTranscriptomics and the assignments are still the same, keep in mind that this repo is NOT meant to be a cheat sheet, even if it generates the figures that are supposed to be "the solution." You will still have to understand the data you're working with. You will still have to manually figure out which subset of the data you're interested in. You will still have to do some work to make your figures look pretty. There is always more to do. This is only meant to make your life a little bit easier, not solve all your problems for you.
 
@@ -268,7 +268,7 @@ Listed in chronological order:
 | 8 | Lab 7 | R/lemis_eda.R | EDA on the lemis dataset. |
 | 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
 | 10 | Lab 9 | R/malaria_pca.R | Performs PCA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
-| 11 | Lab 9 | R/malaria_deg_analysis.R | Performs differential gene expression analysis on the malaria dataset. |
+| 11 | Lab 9 | R/malaria\_deg\_analysis.R | Performs differential gene expression analysis on the malaria dataset. |
 | 12 | Lab 10 | R/covid19\_eda.R | Starter script for EDA on the covid19 dataset. |
 | 13 | Lecture 14 | R/covid19\_scrnaseq\_clustering.R | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
 | 14 | Lecture 14 | R/covid19\_scrnaseq\_seurat.R | scRNAseq analysis on covid19_scrnaseq dataset. Plots a UMAP and finds cluster-specific genes. |
