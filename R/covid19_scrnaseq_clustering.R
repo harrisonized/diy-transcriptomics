@@ -81,30 +81,16 @@ pheatmap(
 
 
 # ----------------------------------------------------------------------
-# Subset data
-
-# subset
-my.subset <- sce_counts[,c(1,2,8)]
-
-# make sure all your markers were actually observed in your single cell data.  Remove markers that were not detected
-marker_in_sce <- match(rownames(marker_matrix), rowData(sce_counts)[['Symbol']])
-# stopifnot(all(!is.na(marker_in_sce)))
-
-# subset data to include only markers
-sce_marker <- sce_counts[marker_in_sce, ]
-# stopifnot(all.equal(rownames(marker_matrix), rowData(sce_marker)[['Symbol']]))
-
-
-# ----------------------------------------------------------------------
 # Use cellassign to assign identity to cell clusters
 
-# compute size factors
-sce_counts <- scran::computeSumFactors(sce_counts)
-
+# only include markers detected in sce_counts
+markers_in_sce <- match(rownames(marker_matrix), rowData(sce_counts)[['Symbol']])
+sce_counts_subset <- sce_counts[markers_in_sce, ]  # filter sce_counts using markers
+factors <- scran::computeSumFactors(sce_counts)  # compute size factors
 fit <- cellassign(
-    exprs_obj = sce_marker,
+    exprs_obj = sce_counts_subset,
     marker_gene_info = marker_matrix,
-    s = sizeFactors(sce_counts),
+    s = sizeFactors(factors),
     shrinkage = TRUE,
     max_iter_adam = 50,
     min_delta = 2,
