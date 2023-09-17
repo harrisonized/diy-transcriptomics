@@ -271,6 +271,7 @@ Listed in chronological order:
 | 11 | Lab 9 | R/malaria\_deg\_analysis.R | Performs differential gene expression analysis on the malaria dataset. |
 | 12 | Lab 10 | R/covid19\_eda.R | Starter script for EDA on the covid19 dataset. |
 | 13 | Lecture 14 | R/covid19\_scrnaseq\_clustering.R | scRNAseq analysis on covid19_scrnaseq dataset. Does the clustering and heatmap generation. |
-| 14 | Lecture 14 | R/covid19\_scrnaseq\_seurat.R | scRNAseq analysis on covid19_scrnaseq dataset. Plots a UMAP and finds cluster-specific genes. |
-| 15 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. |
-| 16 | Lecture 10 | R/malaria\_functional\_enrichment.R | This is the only script that has not been addressed, because it was skipped during the main course. |
+| 14 | Lecture 14 | R/covid19\_scrnaseq\_qc.R | scRNAseq analysis on covid19_scrnaseq dataset. Filters empty drops and creates some QC plots. |
+| 15 | Lecture 14 | R/covid19\_scrnaseq\_seurat.R | scRNAseq analysis on covid19_scrnaseq dataset. Plots a UMAP and finds cluster-specific genes. |
+| 16 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. |
+| 17 | Lecture 10 | R/malaria\_functional\_enrichment.R | This is the only script that has not been addressed, because it was skipped during the main course. |
