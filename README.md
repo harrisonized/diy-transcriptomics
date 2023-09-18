@@ -276,4 +276,4 @@ Listed in chronological order:
 | 16 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. Integrates the two datasets, then goes through the standard clustering workflow on the integrated dataset. Afterward, there are some examples of cluster assignment. |
 | 17 | Lecture 10 | R/malaria\_functional\_enrichment.R | This is the only script that I haven't worked on yet, because it was skipped during the main course. I may revisit this in the future. |
 
-In addition, there are two utility files (`scrnaseq_qc_plots.R` and `utils.R`) used for reusable functions used in some of the scripts.
+In addition, there are two files (`scrnaseq_qc_plots.R` and `utils.R`) to store reusable functions. For some of the scripts, if I couldn't get the code to run (eg. I couldn't install scater), I simply hashed it out.
