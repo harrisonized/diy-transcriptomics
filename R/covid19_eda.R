@@ -1,6 +1,6 @@
 # See: https://diytranscriptomics.com/lab/lab-10
 
-wd = dirname(dirname(this.path::here()))  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 # library(tidyverse) # too broad
 library('readr')
 library('textshape')
