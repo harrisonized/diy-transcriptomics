@@ -10,7 +10,7 @@ library('SingleR') # automated cell type annotation ('label transfer') using ref
 suppressMessages(library('celldex')) # a large collection of reference expression datasets with curated cell type labels for use with SingleR package
 library('scran')
 library('pheatmap')
-# library('scater')  # plotUMAP is the Scater equivalent of Seurat's DimPlot, could not install this
+# library('scater')  # plotUMAP, could not install this
 library('optparse')
 library('logr')
 

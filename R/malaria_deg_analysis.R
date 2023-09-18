@@ -1,7 +1,7 @@
 ## Adapted from: Step4_publicData.R, Step5_diff_genes.R
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-# library(tidyverse) # too broad
+# library(tidyverse)  # too broad
 library('readr')
 library('tibble')
 library('tidyr')

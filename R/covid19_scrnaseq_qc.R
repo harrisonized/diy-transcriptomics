@@ -2,7 +2,7 @@
 ## Filters empty drops and creates some QC plots
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-source(file.path(wd, 'R', 'scrnaseq_qc_plots.R'))  # bc_rank_plot, print_HTML
+source(file.path(wd, 'R', 'functions', 'scrnaseq_qc_plots.R'))  # bc_rank_plot, print_HTML
 suppressMessages(library('Seurat'))
 library('Matrix')
 suppressMessages(library('DropletUtils'))

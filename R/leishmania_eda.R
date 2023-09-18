@@ -10,7 +10,7 @@ suppressMessages(library('GenomicFeatures'))
 library('tibble')
 library('optparse')
 library('logr')
-source(file.path(wd, 'R', 'utils.R'))  # list_files, filter_list_for_match
+source(file.path(wd, 'R', 'functions', 'utils.R'))  # list_files, filter_list_for_match
 
 
 # ----------------------------------------------------------------------

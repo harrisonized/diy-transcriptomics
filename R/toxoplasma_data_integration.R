@@ -1,32 +1,18 @@
-# This follows DIY_scRNAseq.R
-#
-# In the 2nd 1/2 of the script, we'll import two separate Seurat
-# objects generated from the spleen of naive and Toxoplasma gondii
-# infected mice, giving us an opportunity to create and analyze an
-# integrated dataset
-
-# # To demonstrate integration, we'll leave behind the PBMC dataset we worked with above
-# We'll read in two Seurat objects - one generated from the spleen of a untreated mouse (control), 
-# and the second from the spleen of mouse infected with Toxoplasma gondii
+## Adapted from: DIY_scRNAseq.R
+## Compare two Seurat objects from the spleen of naive mice versus
+## Toxoplasma gondii infected mice.
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-source(file.path(wd, 'R', 'utils.R'))
-source(file.path(wd, 'R', 'functions.R'))
-
-library('Seurat')
+suppressMessages(library('Seurat'))
 library('Matrix')
-library('DropletUtils')
-
+suppressMessages(library('DropletUtils'))
 reticulate::use_condaenv('r-reticulate')  # required for cellassign to access tensorflow through python
 library('cellassign')  # takes a few seconds
-
 library('scran')
 library('SingleR') # automated cell type annotation ('label transfer') using reference data
 library('celldex') # a large collection of reference expression datasets with curated cell type labels for use with SingleR package
-
-# library('scater')  # could not install  # what do we need this for?
-
-# library(tidyverse)
+# library('scater')  # plotUMAP, could not install this
+# library(tidyverse)  # too broad
 library('tibble')
 library('dplyr')
 library('rjson')
@@ -34,11 +20,9 @@ library('R2HTML')
 library('readr')
 library('textshape')
 library('scales')
-
 library('ggplot2')
 library('DT')
 library('pheatmap')
-
 library('optparse')
 library('logr')
 

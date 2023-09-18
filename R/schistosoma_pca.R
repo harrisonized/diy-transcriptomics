@@ -4,7 +4,7 @@
 ## Then, there are examples from gt, DT, and plotly
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-# library(tidyverse) # too broad
+# library(tidyverse)  # too broad
 library('readr')
 library('tibble')
 library('tidyr')

@@ -18,7 +18,7 @@ suppressMessages(library('GenomicFeatures'))
 suppressMessages(library('edgeR'))  # DGElist, cpm
 library('optparse')
 library('logr')
-source(file.path(wd, 'R', 'utils.R'))  # list_files, filter_list_for_match
+source(file.path(wd, 'R', 'functions', 'utils.R'))  # list_files, filter_list_for_match
 
 
 # ----------------------------------------------------------------------

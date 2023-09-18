@@ -4,7 +4,7 @@
 
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-# library(tidyverse) # too broad
+# library(tidyverse)  # too broad
 suppressMessages(library('readr'))  # read_tsv
 suppressMessages(library('tidyr'))  # pivot_longer
 suppressMessages(library('edgeR'))  # DGEList
@@ -13,7 +13,7 @@ library('tibble')
 library('tximport')
 library('optparse')
 library('logr')
-source(file.path(wd, 'R', 'utils.R'))  # list_files, filter_list_for_match
+source(file.path(wd, 'R', 'functions', 'utils.R'))  # list_files, filter_list_for_match
 
 
 # ----------------------------------------------------------------------
