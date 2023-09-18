@@ -1,5 +1,8 @@
-`Homo_sapiens.GRCh38.cdna.all.fa.gz` was downloaded from Ensemble here: [https://ftp.ensembl.org/pub/current_fasta/homo_sapiens/cdna/](https://ftp.ensembl.org/pub/current_fasta/homo_sapiens/cdna/)
+This is required for the first part of the course that uses the leishmania dataset.
 
-`Homo_sapiens.GRCh38.cdna.all.index` was generated from `bash/build_kallisto_index.sh`
+Links to the data are available [here](https://ftp.ensembl.org/pub/current_fasta/homo_sapiens/cdna/)
 
-`genbank-k31.lca.json.gz` was downloaded from here: [https://osf.io/4f8n3/download](https://osf.io/4f8n3/download)
+Download the following files:
+
+1. [Homo_sapiens.GRCh38.cdna.all.fa.gz](https://ftp.ensembl.org/pub/current_fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz). Use this as an input to `bash/build_kallisto_index.sh` to output `Homo_sapiens.GRCh38.cdna.all.index`.
+
