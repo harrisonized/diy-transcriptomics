@@ -273,7 +273,7 @@ Listed in chronological order:
 | 13 | Lecture 14 | R/covid19\_scrnaseq\_qc.R | scRNAseq analysis on covid19_scrnaseq dataset. Filters empty drops and creates some QC plots. |
 | 14 | Lecture 14 | R/covid19\_scrnaseq\_seurat.R | scRNAseq analysis on covid19_scrnaseq dataset. Creates a Seurat object from the empty-drop-filtered cellranger output. Plots UMAPs and heatmaps of DEGs. |
 | 15 | Lecture 14 | R/covid19\_scrnaseq\_assign\_clusters.R | scRNAseq analysis on covid19_scrnaseq dataset after filtering. Autoassigns cluster identities based on publically available datasets. |
-| 16 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. |
+| 16 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. Integrates the two datasets, then goes through the standard clustering workflow on the integrated dataset. Afterward, there are some examples of cluster assignment. |
 | 17 | Lecture 10 | R/malaria\_functional\_enrichment.R | This is the only script that has not been addressed, because it was skipped during the main course. |
 
 In addition, there are two utility files (`scrnaseq_qc_plots.R` and `utils.R`) used for reusable functions used in some of the scripts.

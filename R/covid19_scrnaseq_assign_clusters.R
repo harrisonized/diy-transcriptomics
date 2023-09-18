@@ -110,7 +110,7 @@ sce_counts[['cell_type']] <- fit[['cell_type']]
 
 
 # ----------------------------------------------------------------------
-# Label clusters using public datasets from celldex
+# Label clusters using celldex
 # requires an internet connection to connect to ExperimentHub
 
 # switch

@@ -1,5 +1,7 @@
 ## Adapted from: DIY_scRNAseq.R
-## Compare two Seurat objects from the spleen of naive mice versus Toxoplasma gondii infected mice.
+## Compare two Seurat objects from the spleen of naive mice versus Toxoplasma gondii infected mice
+## Runs FindIntegrationAnchors and IntegrateData, then goes through the standard clustering workflow
+## Afterward, there are some examples of cluster assignment
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 source(file.path(wd, 'R', 'functions', 'utils.R'))  # load_rdata
@@ -13,7 +15,7 @@ library('SingleR') # automated cell type annotation ('label transfer') using ref
 suppressMessages(library('celldex')) # a large collection of reference expression datasets with curated cell type labels for use with SingleR package
 # library('scater')  # plotUMAP, could not install this
 library('tibble')
-suppressMessages(library('dplyr'))
+suppressMessages(library('dplyr'))  # %>% operator
 library('rjson')
 library('R2HTML')
 library('readr')
@@ -49,14 +51,14 @@ option_list = list(
     make_option(c("-k", "--label-2"), default='infected', metavar='infected',
                 type="character", help="label input-2"),
 
-    # don't need this
-    # make_option(c("-m", "--metadata"), default="data/toxoplasma/studyDesign.txt",
-    #             metavar="data/toxoplasma/studyDesign.txt", type="character",
-    #             help="path/to/study_design.txt file"),
-
     make_option(c("-o", "--output-dir"), default="figures/toxoplasma",
                 metavar="figures/toxoplasma", type="character",
                 help="set the output directory for the figures"),
+
+    # I'd prefer not to use this
+    # make_option(c("-m", "--metadata"), default="data/toxoplasma/studyDesign.txt",
+    #             metavar="data/toxoplasma/studyDesign.txt", type="character",
+    #             help="path/to/study_design.txt file"),
 
     make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
                 metavar="FALSE", type="logical",
@@ -90,7 +92,7 @@ seurat_1$treatment <- opt['label-1'][[1]]  # naive
 # Plot UMAP of raw data
 DimPlot(seurat_1, reduction = "umap", split.by = "orig.ident", label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap_1.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-unlabeled_1.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -100,7 +102,7 @@ seurat_2$treatment <- opt['label-2'][[1]]  # infected
 # Plot UMAP of raw data
 DimPlot(seurat_2, reduction = "umap", split.by = "orig.ident", label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap_2.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-unlabeled_2.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -210,7 +212,7 @@ integrated_seurat <- FindClusters(integrated_seurat, resolution = 0.5)
 # Plot UMAP with clusters highlighted
 DimPlot(integrated_seurat, reduction = "umap", label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap_integrated.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-integrated.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -220,7 +222,7 @@ DimPlot(integrated_seurat, reduction = "umap",
         group.by = "seurat_clusters", # labels the cells with values from your group.by variable
         label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap_split_by_treatment.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-integrated-split.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -235,7 +237,7 @@ FeaturePlot(integrated_seurat,
             min.cutoff = 'q10',
             label = FALSE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], paste0('umap_', tolower(gene), '.png')),
+    ggsave(file.path(wd, opt['output-dir'][[1]], paste0('umap-', tolower(gene), '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -251,13 +253,13 @@ FeaturePlot(integrated_seurat,
             label = FALSE)
 if (!troubleshooting) {
     ggsave(file.path(wd, opt['output-dir'][[1]],
-                     paste0('umap_', paste(tolower(genes), collapse="_"), '.png')),
+                     paste0('umap-', paste(tolower(genes), collapse="_"), '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 
 # ----------------------------------------------------------------------
-# Label clusters using public dataset from celldex
+# Label clusters using celldex
 
 log_print(paste(Sys.time(), 'Labeling clusters...'))
 
@@ -282,7 +284,7 @@ DimPlot(
     label = TRUE
 )
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap_singler_labels.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'labeled', 'umap-integrated-celldex_labeled.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -303,7 +305,7 @@ DimPlot(integrated_seurat, reduction = "umap",
         split.by = "treatment", # this facets the plot 
         label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap_treatment.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'labeled', 'umap-integrated-manually_labeled.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -312,46 +314,70 @@ if (!troubleshooting) {
 
 
 # ----------------------------------------------------------------------
-# Focus on CD4 T cells
+# Find cluster-specific DEGs
 
-integrated_seurat.CD4.Tcells <- subset(integrated_seurat, idents = "CD4+ T cells")
+cluster_of_interest = "CD4+ T cells"
+integrated_seurat_subset <- subset(integrated_seurat, idents = cluster_of_interest)
 
 # you could re-cluster if you want...depends on what you're trying to accomplish
-#integrated_seurat.CD4.Tcells <- FindNeighbors(integrated_seurat.CD4.Tcells, dims = 1:10, k.param = 5)
-#integrated_seurat.CD4.Tcells <- FindClusters(integrated_seurat.CD4.Tcells)
-DimPlot(integrated_seurat.CD4.Tcells, reduction = "umap", label = TRUE)
+#integrated_seurat_subset <- FindNeighbors(integrated_seurat_subset, dims = 1:10, k.param = 5)
+#integrated_seurat_subset <- FindClusters(integrated_seurat_subset)
+
+DimPlot(integrated_seurat_subset, reduction = "umap", label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap_cd4_t_cells.png'),
+
+    # format string
+    cluster_of_interest_f <- strsplit(cluster_of_interest, split=' ')[[1]] %>%
+        paste(collapse="_") %>%
+        gsub('[+]', '', .) %>%  # remove special characters
+        tolower()
+
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'labeled',
+                     paste0('umap-', cluster_of_interest_f, '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
-# now we need to switch out 'Idents' to be treatment, rather than cluster
-Idents(integrated_seurat.CD4.Tcells) <- integrated_seurat.CD4.Tcells[['treatment']]
-inf.vs.naive.markers <- FindMarkers(object = integrated_seurat.CD4.Tcells, 
-                                    ident.1 = "infected", 
-                                    ident.2 = "naive", 
-                                    min.pct = 0)
-# Note: If you hash out "Idents", you'll get the following cryptic error message:
+# Switch out 'Idents' to be treatment, rather than cluster
+# Note: If this line is not run, then you will get the following error when running FindMarkers:
 # Error in WhichCells.Seurat(object = object, idents = ident.1) :
 #   Cannot find the following identities in the object: infected"
+Idents(integrated_seurat_subset) <- integrated_seurat_subset[['treatment']]
 
-inf.vs.naive.markers[['pct.diff']] <- inf.vs.naive.markers[['pct.1']] - inf.vs.naive.markers[['pct.2']]
-inf.vs.naive.markers.df <- as_tibble(inf.vs.naive.markers, rownames = "geneID")
+degs <- FindMarkers(
+    object = integrated_seurat_subset, 
+    ident.1 = "infected", 
+    ident.2 = "naive", 
+    min.pct = 0
+)
 
-# Export DEGs for each cluster (ranked by avg_logFC > 0.5)
-myTopHits <- inf.vs.naive.markers.df %>% arrange(desc(avg_log2FC))
-FeaturePlot(integrated_seurat.CD4.Tcells, 
+degs[['pct.diff']] <- degs[['pct.1']] - degs[['pct.2']]
+degs.df <- as_tibble(degs, rownames = "geneID")
+
+# # top 20 DEGs
+# degs_top20 <- degs.df %>% arrange(desc(avg_log2FC)) %>% slice(1:20)
+# if (!troubleshooting) {
+#     write_tsv(
+#         degs_top20,
+#         file.path(wd, opt['input-dir'][[1]], 'degs-top_20.tsv')
+#     )
+# }
+
+# Plot UMAP for specific gene of interest
+gene = "Ccl5"
+FeaturePlot(integrated_seurat_subset, 
             reduction = "umap", 
-            features = "Ccl5",
+            features = gene,
             pt.size = 0.4, 
             order = TRUE,
             split.by = "treatment",
             min.cutoff = 'q10',
             label = FALSE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'feature_plot_ccl5.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'labeled',
+                     paste0('umap-', tolower(gene), '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
+
 
 end_time = Sys.time()
 log_print(paste('Script ended at:', Sys.time()))
@@ -364,5 +390,5 @@ log_close()
 
 # # example of annotating seurat objects using metadata
 # study_design <- read_tsv(file.path(wd, opt['metadata'][[1]]))
-# seurat_1[['treatment']] <- study_design[['treatment']][1]  # naive
-# seurat_2[['treatment']] <- study_design[['treatment']][2]  # infected
+# seurat_1$treatment <- study_design[['treatment']][1]  # naive
+# seurat_2$treatment <- study_design[['treatment']][2]  # infected
