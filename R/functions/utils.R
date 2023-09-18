@@ -28,6 +28,15 @@ filter_list_for_match <- function(items, pattern) {
 }
 
 
+# loads an RData file, and returns it
+# Without this function, base R uses the filename as the variable name
+# See: https://stackoverflow.com/questions/5577221/can-i-load-a-saved-r-object-into-a-new-object-name
+load_rdata <- function(filepath){
+    load(filepath)
+    return( get(basename(filepath)) )
+}
+
+
 join_many_csv <- function(filepaths, index_cols, value_cols, ext='csv', recursive=TRUE, sep=',') {
     filenames = c(tools::file_path_sans_ext(basename(dirname(paths))))  # get the foldername
 

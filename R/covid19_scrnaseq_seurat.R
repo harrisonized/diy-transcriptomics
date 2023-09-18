@@ -125,9 +125,9 @@ if (!troubleshooting) {
 
 
 # ----------------------------------------------------------------------
-# Plot UMAPs
+# Standard Clustering Workflow
 
-log_print(paste(Sys.time(), 'UMAP Clustering...'))
+log_print(paste(Sys.time(), 'Running standard clustering workflow...'))
 
 # it is standard practice to apply a linear transformation ('scaling') before PCA.
 # For single cell data this includes:
