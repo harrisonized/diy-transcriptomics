@@ -143,12 +143,12 @@ p1 <- ggplot(cpm_long) +
                show.legend = FALSE) +
   labs(y="log2 expression", x = "sample",
        title="Log2 Counts per Million (CPM)",
-       subtitle="unfiltered, non-normalized",
+       subtitle="unfiltered, unnormalized",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cpm_unfiltered_nonnormalized.png'),
+    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cpm_unfiltered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -182,12 +182,12 @@ p2 <- ggplot(cpm_long) +
         show.legend = FALSE) +
     labs(y="log2 expression", x = "sample",
         title="Log2 Counts per Million (CPM)",
-        subtitle="filtered, non-normalized",
+        subtitle="filtered, unnormalized",
         caption=paste0("produced on ", Sys.time())) +
     theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, 'figures', 'malaria', 'eda', 'cpm_filtered_nonnormalized.png'),
+    ggsave(file.path(wd, 'figures', 'malaria', 'eda', 'cpm_filtered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
