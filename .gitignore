@@ -2,8 +2,10 @@
 .Rproj.user
 .ipynb_checkpoints
 data
-logs
+log
 Untitled.ipynb
 */data
 .DS_Store
 .Rhistory
+Rplots.pdf
+figures/archive
