@@ -1,0 +1,7 @@
+{
+    "Monocytes": ["CD14", "CD68"],
+    "T cells": ["CD2", "CD3D", "TRAC", "IL32", "CD3E", "PTPRC"],
+    "NK cells": ["GZMK", "KLRF1", "CCL3", "CMC1", "NKG7", "PTPRC"],
+    "Plasma cells": ["CD27", "IGHG1", "CD79A", "IGHG2", "PTPRC", "IGKC"],
+    "Mature B cells": ["MS4A1", "LTB", "CD52", "IGHD", "CD79A", "PTPRC", "IGKC"]
+}

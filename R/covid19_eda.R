@@ -1,4 +1,4 @@
-# See: https://diytranscriptomics.com/lab/lab-10
+## See: https://diytranscriptomics.com/lab/lab-10
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
 # library(tidyverse)  # too broad
@@ -14,6 +14,18 @@ library('logr')
 
 # args
 option_list = list(
+    make_option(c("-h", "--human-data"),
+                default="data/covid19_bulkrnaseq_challenge/GSE147507_RawReadCounts_Human.tsv",
+                metavar="data/covid19_bulkrnaseq_challenge/GSE147507_RawReadCounts_Human.tsv",
+                type="character",
+                help="path/to/human_data.tsv"),
+
+    make_option(c("-f", "--ferret-data"),
+                default="data/covid19_bulkrnaseq_challenge/GSE147507_RawReadCounts_Ferret.tsv",
+                metavar="data/covid19_bulkrnaseq_challenge/GSE147507_RawReadCounts_Ferret.tsv",
+                type="character",
+                help="path/to/human_data.tsv"),
+
     make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
                 metavar="FALSE", type="logical",
                 help="enable if troubleshooting to prevent overwriting your files")
@@ -31,15 +43,15 @@ log_print(paste('Script started at:', start_time))
 # ----------------------------------------------------------------------
 # Read Data
 
-human_covid_data <- read_tsv(file.path(wd, "data", "covid19_challenge", "GSE147507_RawReadCounts_Human.tsv"))
+human_covid_data <- read_tsv(file.path(wd, opt['human-data'][[1]]))
 human_covid_data <- as.matrix(column_to_rownames(human_covid_data, "...1"))
 
-ferret_covid_data <- read_tsv(file.path(wd, "data", "covid19_challenge", "GSE147507_RawReadCounts_Human.tsv"))
+ferret_covid_data <- read_tsv(file.path(wd, opt['ferret-data'][[1]]))
 ferret_covid_data <- as.matrix(column_to_rownames(ferret_covid_data, "...1"))
+
 
 # ----------------------------------------------------------------------
 # Peform EDA here
-
 
 
 end_time = Sys.time()
