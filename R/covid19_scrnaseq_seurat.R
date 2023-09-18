@@ -7,8 +7,6 @@
 ## https://www.10xgenomics.com/resources/datasets
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-source(file.path(wd, 'R', 'utils.R'))
-source(file.path(wd, 'R', 'functions.R'))  # 
 suppressMessages(library('Seurat'))
 library('Matrix')
 suppressMessages(library('DropletUtils'))
@@ -68,10 +66,10 @@ log_print(paste(Sys.time(), 'Reading data...'))
 
 filt_mtx <- Read10X(
     file.path(wd, opt['input-dir'][[1]], 'counts_filtered', 'cellranger'),
-  gene.column = 2,
-  cell.column = 1,
-  unique.features = TRUE,
-  strip.suffix = FALSE
+    gene.column = 2,
+    cell.column = 1,
+    unique.features = TRUE,
+    strip.suffix = FALSE
 )
 
 # ----------------------------------------------------------------------

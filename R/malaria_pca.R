@@ -4,8 +4,7 @@
 ## This is a gutted version of schistosoma_pca.R
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-source(file.path(wd, 'R', 'utils.R'))
-# library(tidyverse) # too broad
+# library(tidyverse)  # too broad
 library('readr')
 library('tibble')
 library('tidyr')
