@@ -81,7 +81,9 @@ pheatmap(
 
 
 # ----------------------------------------------------------------------
-# Use cellassign to assign identity to cell clusters
+# Label clusters using cellassign
+
+log_print(paste(Sys.time(), 'Labeling clusters using cellassign...'))
 
 # only include markers detected in sce_counts
 markers_in_sce <- match(rownames(marker_matrix), rowData(sce_counts)[['Symbol']])
