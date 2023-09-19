@@ -269,7 +269,7 @@ Listed in chronological order:
 | 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
 | 10 | Lab 9 | R/malaria_pca.R | Performs PCA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
 | 11 | Lab 9 | R/malaria\_deg\_analysis.R | Performs differential gene expression analysis on the malaria dataset. |
-| 12 | Lab 10 | R/covid19\_eda.R | Starter script for EDA on the covid19 dataset. |
+| 12 | Lab 10 | R/covid19\_bulkrnaseq\_challenge.R | Starter script for the covid19\_bulkrnaseq\_challenge dataset. |
 | 13 | Lecture 14 | R/covid19\_scrnaseq\_qc.R | scRNAseq analysis on covid19_scrnaseq dataset. Filters empty drops and creates some QC plots. |
 | 14 | Lecture 14 | R/covid19\_scrnaseq\_seurat.R | scRNAseq analysis on covid19_scrnaseq dataset. Creates a Seurat object from the empty-drop-filtered cellranger output. Plots UMAPs and heatmaps of DEGs. |
 | 15 | Lecture 14 | R/covid19\_scrnaseq\_assign\_clusters.R | scRNAseq analysis on covid19_scrnaseq dataset after filtering. Autoassigns cluster identities based on publically available datasets. |
