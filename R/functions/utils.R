@@ -1,24 +1,8 @@
 ## Functions
-## list_files
 ## filter_list_for_match
-## load_rdata
-## join_many_csv
+## list_files
 ## read_10x
-
-
-#' list all files in all subdirectories with a given extension
-#' 
-#' @export
-list_files <- function(dir_path, ext=NULL, recursive = TRUE) {
-    all_files = list.files(dir_path, recursive = recursive, full.name=TRUE)
-
-    if (!is.null(ext)) {
-        # See: https://stackoverflow.com/questions/7187442/filter-a-vector-of-strings-based-on-string-matching
-        return (all_files[tools::file_ext(all_files)==ext])
-    } else {
-        return (all_files)
-    }
-}
+## load_rdata
 
 
 #' return elements of a list matching a particular substring
@@ -35,12 +19,18 @@ filter_list_for_match <- function(items, pattern) {
 }
 
 
-# loads an RData file, and returns it
-# Without this function, base R uses the filename as the variable name
-# See: https://stackoverflow.com/questions/5577221/can-i-load-a-saved-r-object-into-a-new-object-name
-load_rdata <- function(filepath){
-    load(filepath)
-    return( get(ls()[ls() != "filepath"]) )
+#' list all files in all subdirectories with a given extension
+#' 
+#' @export
+list_files <- function(dir_path, ext=NULL, recursive = TRUE) {
+    all_files = list.files(dir_path, recursive = recursive, full.name=TRUE)
+
+    if (!is.null(ext)) {
+        # See: https://stackoverflow.com/questions/7187442/filter-a-vector-of-strings-based-on-string-matching
+        return (all_files[tools::file_ext(all_files)==ext])
+    } else {
+        return (all_files)
+    }
 }
 
 
@@ -85,4 +75,15 @@ read_10x <- function(
     # )
 
     return(expr_mtx)
+}
+
+
+#' loads an RData file, and returns it
+#' Without this function, base R uses the filename as the variable name
+#' See: https://stackoverflow.com/questions/5577221/can-i-load-a-saved-r-object-into-a-new-object-name
+#' 
+#' @export
+load_rdata <- function(filepath){
+    load(filepath)
+    return( get(ls()[ls() != "filepath"]) )
 }

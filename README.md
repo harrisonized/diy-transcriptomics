@@ -16,9 +16,7 @@ After the class ended, I still wanted to make sure I made it through every aspec
 
 That way, if you have a custom analysis, you should be able to reuse the same script, swap out the data, and make minimal adjustments to do roughly the same analysis. Furthermore, you will be able to copy code chunks to quickly put together custom scripts, much like you can assemble a castle out of legos. 
 
-One caveat is that if you are currently taking DIYTranscriptomics and the assignments are still the same, keep in mind that this repo is NOT meant to be a cheat sheet, even if it generates the figures that are supposed to be "the solution." This is only meant to make your life a little bit easier, not solve all your problems for you. You will still have to understand the data you're working with. You will still have to manually figure out which subset of the data you're interested in. You will still have to do work to make your figures look pretty. I left this repo at the bare minimum of the solution, because if I were to invest time making things pretty, I'd rather do it for my own datasets and projects (sorry!).
-
-If you try this code and you run into problems, please reach out to me through my Penn email, and I will be happy to answer your questions.
+One caveat is that if you are currently taking DIYTranscriptomics and the assignments are still the same, keep in mind that this repo is NOT meant to be a cheat sheet, even if it generates the figures that are supposed to be "the solution." This is only meant to make your life a little bit easier, not solve all your problems for you. You will still have to understand the data you're working with. You will still have to manually figure out which subset of the data you're interested in. You will still have to do work to make your figures look pretty. I left this repo at the bare minimum, because if I were to invest time making things pretty, I'd rather do it for my own datasets and projects (sorry!).
 
 ## Library Installations
 
@@ -255,11 +253,11 @@ This is by far the most frustrating part of the course, so I made sure to docume
 
 ## Scripts
 
-These are all the scripts covered in the lecture and lab portions of the class. There are a total of 17, listed in chronological order of when it was taught in Spring 2023. There are 15 scripts that cover the 7 main datasets: leishmania (4), schistosoma (2), lemis (1), malaria (4), covid19\_scrnaseq (3), and toxoplasma (1). Aside from these, the biomart dataset does not require previous download, and covid19_bulkrnaseq is standalone, left as an exercise to the reader.
+These are all the scripts covered in the lecture and lab portions of the class. There are a total of 18 scripts, listed in chronological order of when it was taught in Spring 2023. There are 15 scripts that cover the 7 main datasets: leishmania (4), schistosoma (2), lemis (1), malaria (4), covid19\_scrnaseq (3), and toxoplasma (1). Aside from these, `query_biomart.R` is standalone, and `R/covid19_bulkrnaseq_challenge.R`, and `covid19_scrnaseq_challenge.R` are left as exercises to the reader.
 
 | Script Number | Source | Script Name | Description |
 | :--- | ------ | ------ | ----------- |
-| 1 | Lecture 2 | bash/build\_kallisto\_index.sh  | Use Kallisto to build an index on leishmania dataset |
+| 1 | Lecture 2 | bash/build\_kallisto\_index.sh  | Use Kallisto to build an index on leishmasnia dataset |
 | 2 | Lab 2 | bash/map\_reads.sh | Use Kallisto to map reads to the index file on leishmania dataset |
 | 3 | Lab 5 | bash/estimate\_sequence\_similarity.sh | Use Sourmash to identify non-human reads. Use Centrifuge to search for gene signatures. |
 | 4 | Lab 4 | R/query\_biomart.R | This standalone script provides an example for how to query bioMart's database. |
@@ -277,4 +275,8 @@ These are all the scripts covered in the lecture and lab portions of the class. 
 | 17 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. Integrates the two datasets, then goes through the standard clustering workflow on the integrated dataset. Afterward, there are some examples of cluster assignment. |
 | 18 | Lab 13 | R/covid19\_scrnaseq\_challenge.R | Starter script for the covid19\_scrnaseq\_challenge dataset. |
 
-In addition, there are two files (`scrnaseq_qc_plots.R` and `utils.R`) to store reusable functions. For some of the scripts, if I couldn't get the code to run, I simply hashed it out. For example, I couldn't install `scater`, and I have yet to get to fixing the bugs in `scrnaseq_qc_plots::print_HTML`).
+In addition, there are two files (`scrnaseq_qc_plots.R` and `utils.R`) to store reusable functions. For some of the scripts, if I couldn't get the code to run, I simply hashed it out. For example, I couldn't install `scater`, and I have yet to get to fixing the bugs in `scrnaseq_qc_plots::print_HTML`). Lastly, GSEA analysis was not emphasized during the class, and I have yet to try it out.
+
+## Getting Help
+
+If you try this code and you run into problems, please reach out to me through my Penn email: first (dot) last_name @ pennmedicine (dot) upenn (dot) edu, and I will be happy to answer your questions.
