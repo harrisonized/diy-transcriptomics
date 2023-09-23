@@ -3,7 +3,7 @@
 ## using 'EnsDb.Hsapiens.v86' to annotate each row of the resulting dataframe.
 ## No outputs, run this in RStudio
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 suppressMessages(library('EnsDb.Hsapiens.v86'))
 # suppressMessages(library('BSgenome.Mfuro.UCSC.musFur1'))
 suppressMessages(library('GenomicFeatures'))

@@ -2,7 +2,7 @@
 ## Creates a Seurat object from the empty-drop-filtered cellranger output.
 ## Plots UMAPs and heatmaps of all DEGs and cluster-specific DEGs
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 suppressMessages(library('Seurat'))
 library('Matrix')
 suppressMessages(library('DropletUtils'))

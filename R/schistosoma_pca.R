@@ -3,7 +3,7 @@
 ## Performs PCA and plots the dendrogram
 ## Then, there are examples from gt, DT, and plotly
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 # library(tidyverse)  # too broad
 library('readr')
 library('tibble')

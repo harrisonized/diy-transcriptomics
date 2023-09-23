@@ -2,7 +2,7 @@
 ## This is NOT based on LEMIS_solution.R
 ## EDA on the lemis dataset.
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 # library(tidyverse)  # too broad
 library('readr')  # read_delim
 suppressMessages(library('dplyr'))

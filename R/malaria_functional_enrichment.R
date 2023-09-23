@@ -12,6 +12,8 @@
 ## Signatures can also be custom made based on your interests.
 ## Signatures can also be pulled from R/Bioconductor as described below
 
+
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 library('tidyverse')
 library('limma')
 library('gplots')  # heatmaps

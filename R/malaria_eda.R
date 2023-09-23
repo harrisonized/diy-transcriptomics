@@ -3,7 +3,7 @@
 ## This script is almost a duplicate of malaria_eda.R
 
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 # library(tidyverse)  # too broad
 suppressMessages(library('readr'))  # read_tsv
 suppressMessages(library('tidyr'))  # pivot_longer

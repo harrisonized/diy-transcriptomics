@@ -3,7 +3,7 @@
 ## Note that this contains code duplication. However, that is acceptable here, because this is only EDA.
 ## Outputs filtered_normalized_cpm.csv, which is required for shistosoma_pca.R
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 # library(tidyverse)  # too broad
 library('readr')  # read_tsv
 suppressMessages(library('dplyr'))

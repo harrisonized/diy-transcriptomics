@@ -2,7 +2,7 @@
 ## Example for using getBM() and getSequences() to query the bioMart database
 ## This is a standalone script
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 library('tibble')
 suppressMessages(library('biomaRt'))
 suppressMessages(library('EnsDb.Hsapiens.v86'))

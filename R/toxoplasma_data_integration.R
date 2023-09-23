@@ -3,7 +3,7 @@
 ## Runs FindIntegrationAnchors and IntegrateData, then goes through the standard clustering workflow
 ## Afterward, there are some examples of cluster assignment
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 source(file.path(wd, 'R', 'functions', 'utils.R'))  # load_rdata
 suppressMessages(library('Seurat'))
 library('Matrix')

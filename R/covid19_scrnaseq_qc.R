@@ -1,7 +1,7 @@
 ## Adapted from: DIY_scRNAseq.R
 ## Filters empty drops and creates some QC plots
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 suppressMessages(library('Seurat'))
 library('Matrix')
 suppressMessages(library('DropletUtils'))

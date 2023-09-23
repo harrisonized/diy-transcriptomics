@@ -1,7 +1,7 @@
 ## Adapted from: DIY_scRNAseq.R
 ## Assigns clusters and uses data from celldex to label them
 
-wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
+wd = dirname(this.path::here())  # wd = '~/github/R/diy-transcriptomics'
 reticulate::use_condaenv('r-reticulate')  # required for cellassign to access tensorflow through python
 library('rjson')
 library('cellassign')  # takes a few seconds
