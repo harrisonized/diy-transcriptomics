@@ -20,11 +20,11 @@ option_list = list(
                 type="character",
                 help="path/to/human_data.tsv"),
 
-    make_option(c("-f", "--ferret-data"),
+    make_option(c("-a", "--animal-data"),
                 default="data/covid19_bulkrnaseq_challenge/GSE147507_RawReadCounts_Ferret.tsv",
                 metavar="data/covid19_bulkrnaseq_challenge/GSE147507_RawReadCounts_Ferret.tsv",
                 type="character",
-                help="path/to/human_data.tsv"),
+                help="path/to/animal_data.tsv"),
 
     make_option(c("-t", "--troubleshooting"), default=FALSE, action="store_true",
                 metavar="FALSE", type="logical",
@@ -43,11 +43,11 @@ log_print(paste('Script started at:', start_time))
 # ----------------------------------------------------------------------
 # Read Data
 
-human_covid_data <- read_tsv(file.path(wd, opt['human-data'][[1]]))
-human_covid_data <- as.matrix(column_to_rownames(human_covid_data, "...1"))
+human_data <- read_tsv(file.path(wd, opt['human-data'][[1]]))
+human_data <- as.matrix(column_to_rownames(human_data, "...1"))
 
-ferret_covid_data <- read_tsv(file.path(wd, opt['ferret-data'][[1]]))
-ferret_covid_data <- as.matrix(column_to_rownames(ferret_covid_data, "...1"))
+animal_data <- read_tsv(file.path(wd, opt['ferret-data'][[1]]))
+animal_data <- as.matrix(column_to_rownames(animal_data, "...1"))
 
 
 # ----------------------------------------------------------------------
