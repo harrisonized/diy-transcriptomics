@@ -2,7 +2,6 @@
 ## Filters empty drops and creates some QC plots
 
 wd = dirname(this.path::here())  # wd = '~/github/diy-transcriptomics'
-source(file.path(wd, 'R', 'functions', 'scrnaseq_qc_plots.R'))  # bc_rank_plot, print_HTML
 suppressMessages(library('Seurat'))
 library('Matrix')
 suppressMessages(library('DropletUtils'))
@@ -17,6 +16,8 @@ library('ggplot2')
 suppressMessages(library('DT'))
 library('optparse')
 library('logr')
+source(file.path(wd, 'R', 'functions', 'scrnaseq_qc_plots.R'))  # bc_rank_plot, print_HTML
+source(file.path(wd, 'R', 'functions', 'utils.R'))  # read_10x
 
 
 # ----------------------------------------------------------------------
@@ -67,18 +68,9 @@ log_print(paste('Script started at:', start_time))
 
 log_print(paste(Sys.time(), 'Reading data...'))
 
-# import raw matrix, barcodes as columns, genes as rows
-raw_mtx <- Matrix::readMM(
-    file.path(wd, opt['input-dir'][[1]], 'counts_unfiltered', 'cellranger', 'matrix.mtx'))
-raw_barcodes <- read_tsv(
-    file.path(wd, opt['input-dir'][[1]],'counts_unfiltered', 'cellranger', 'barcodes.tsv'),
-    col_names=FALSE)  # columns
-raw_genes <- read_tsv(
-    file.path(wd, opt['input-dir'][[1]], 'counts_unfiltered', 'cellranger', 'genes.tsv'),
-    col_names=FALSE)  # rows
-
-colnames(raw_mtx) <- raw_barcodes[['X1']]  # barcode sequence
-rownames(raw_mtx) <- raw_genes[['X2']]  # gene names
+raw_mtx <- read_10x(
+    file.path(wd, opt['input-dir'][[1]], 'counts_unfiltered', 'cellranger')
+)
 
 # load run info from JSON files produced by Kb
 kb_stats <- c(
@@ -199,19 +191,3 @@ end_time = Sys.time()
 log_print(paste('Script ended at:', Sys.time()))
 log_print(paste("Script completed in:", difftime(end_time, start_time)))
 log_close()
-
-
-# ----------------------------------------------------------------------
-# Code Graveyard
-
-# raw_cells <- read.csv(
-#     file.path(wd, 'data', 'covid19_scrnaseq', 'pbmc_1k_v3_scRNAseq_processed',
-#               'counts_unfiltered', 'cellranger', 'barcodes.tsv'),
-#     sep = '\t', header = FALSE
-# )
-
-# filt_barcodes <- read.csv(
-#     file.path(wd, 'data', 'covid19_scrnaseq', 'pbmc_1k_v3_scRNAseq_processed',
-#               'counts_filtered', 'cellranger', 'barcodes.tsv'),
-#     sep = '\t', header = FALSE
-# )

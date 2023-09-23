@@ -1,12 +1,14 @@
-## Common use functions
+## Functions
+## list_files
+## filter_list_for_match
+## load_rdata
+## join_many_csv
+## read_10x
 
-# Functions
-# # list_files
-# # filter_list_for_match
-# # join_many_csv
 
-
-# list all files in a directory
+#' list all files in all subdirectories with a given extension
+#' 
+#' @export
 list_files <- function(dir_path, ext=NULL, recursive = TRUE) {
     all_files = list.files(dir_path, recursive = recursive, full.name=TRUE)
 
@@ -19,7 +21,12 @@ list_files <- function(dir_path, ext=NULL, recursive = TRUE) {
 }
 
 
-# python equivalent: [string for string in items if re.match(pattern, string)]
+#' return elements of a list matching a particular substring
+#'
+#' @examples
+#' filter_list_for_match(c("gene_id_pat", "gene_id_mat", "count"), "pat")
+#' 
+#' @export
 filter_list_for_match <- function(items, pattern) {
     for (i in 1:length(pattern)){
         items <- lapply(items, grep, pattern=pattern[[i]], value=TRUE)
@@ -37,31 +44,45 @@ load_rdata <- function(filepath){
 }
 
 
-join_many_csv <- function(filepaths, index_cols, value_cols, ext='csv', recursive=TRUE, sep=',') {
-    filenames = c(tools::file_path_sans_ext(basename(dirname(paths))))  # get the foldername
+#' Alternative to Seurat::Read10x that enables you to specify the filenames
+#' See: https://github.com/satijalab/seurat/issues/4096
+#'
+#' @export
+read_10x <- function(
+    data_dir,
+    matrix_file='matrix.mtx',
+    genes_file='genes.tsv',
+    barcodes_file='barcodes.tsv'
+) {
 
-    
-    # read dfs and left join on index_cols
-    df_list <- lapply(filepaths, read.csv, sep=sep)
+    if (!file.exists(file.path(data_dir, matrix_file)) |
+        !file.exists(file.path(data_dir, genes_file)) |
+        !file.exists(file.path(data_dir, barcodes_file))) {
 
-    # Warning: column names ‘count.x’, ‘count.y’ are duplicated in the result
-    # See: https://stackoverflow.com/questions/38603668/suppress-any-emission-of-a-particular-warning-message
-    withCallingHandlers({
-        all_reads <- Reduce(
-            function(...) merge(..., by=index_cols),
-            lapply(df_list, "[", c(index_cols, value_cols))
-        )
-    }, warning = function(w) {
-        # print(conditionMessage(w))
-        if (startsWith(conditionMessage(w), "column names")) {
-            invokeRestart( "muffleWarning" )
-        }
-    })
+        filenames = basename(list_files(data_dir))
+        matrix_file = filter_list_for_match(filenames, 'matrix')
+        genes_file = filter_list_for_match(filenames, 'genes')
+        barcodes_file = filter_list_for_match(filenames, 'barcodes')
+    }
+
+    expr_mtx <- Matrix::readMM(file.path(data_dir, matrix_file))
+    genes <- read_tsv(file.path(data_dir, genes_file), col_names=FALSE, show_col_types = FALSE)
+    barcodes <- read_tsv(file.path(data_dir, barcodes_file), col_names=FALSE, show_col_types = FALSE)
     
-    # rename columns
-    colnames(all_reads) = c(
-        index_cols,  # index_cols
-        as.list(outer(value_cols, filenames, paste, sep='-'))  # suffix value_cols with filename
-    )
-    return(all_reads)
+    colnames(expr_mtx) <- barcodes[['X1']]  # barcode sequence
+    rownames(expr_mtx) <- genes[['X2']]  # gene names
+
+    # Return dgCMatrix instead of dgTMatrix
+    # See: https://slowkow.com/notes/sparse-matrix/#the-triplet-format-in-dgtmatrix
+    expr_mtx <- as(expr_mtx, "CsparseMatrix")
+
+    # Note: the above is equivalent to this, but is more explicit
+    # expr_mtx <- Matrix::ReadMtx(
+    #     mtx=file.path(data_dir, matrix_file),
+    #     cells=file.path(data_dir, barcodes_file),
+    #     features=file.path(data_dir, genes_file),
+    #     feature.column=2
+    # )
+
+    return(expr_mtx)
 }
