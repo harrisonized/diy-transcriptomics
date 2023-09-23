@@ -255,7 +255,7 @@ This is by far the most frustrating part of the course, so I made sure to docume
 
 ## Scripts
 
-Listed in chronological order:
+These are all the scripts covered in the lecture and lab portions of the class. There are a total of 17, listed in chronological order of when it was taught in Spring 2023. There are 15 scripts that cover the 7 main datasets: leishmania (4), schistosoma (2), lemis (1), malaria (4), covid19\_scrnaseq (3), and toxoplasma (1). Aside from these, the biomart dataset does not require previous download, and covid19_bulkrnaseq is standalone, left as an exercise to the reader.
 
 | Script Number | Source | Script Name | Description |
 | :--- | ------ | ------ | ----------- |
@@ -269,11 +269,12 @@ Listed in chronological order:
 | 9 | Lab 9 | R/malaria_eda.R | EDA on the malaria dataset. This is almost the same as the schistosoma_eda.R. |
 | 10 | Lab 9 | R/malaria_pca.R | Performs PCA on the malaria dataset. Some of this overlaps with schistosoma_pca.R, but this also includes a heatmap with dendrogram. |
 | 11 | Lab 9 | R/malaria\_deg\_analysis.R | Performs differential gene expression analysis on the malaria dataset. |
-| 12 | Lecture 10 | R/malaria\_functional\_enrichment.R | This is the only script that I haven't worked on yet, because it was skipped during the main course. I may revisit this in the future. |
+| 12 | Lecture 10 | R/malaria\_functional\_enrichment.R | Performs GSEA on the malaria dataset using a variety of different libraries. Covers how to perform GSEA analysis using gProfiler2, clusterProfiler, CAMERA, ROAST, and GSVA. Note that this is the only script I haven't examined in detail yet, so currently, it doesn't work yet. Please be patient, I will get around to it. |
 | 13 | Lab 10 | R/covid19\_bulkrnaseq\_challenge.R | Starter script for the covid19\_bulkrnaseq\_challenge dataset. |
 | 14 | Lecture 14 | R/covid19\_scrnaseq\_qc.R | scRNAseq analysis on covid19_scrnaseq dataset. Filters empty drops and creates some QC plots. |
 | 15 | Lecture 14 | R/covid19\_scrnaseq\_clustering.R | scRNAseq analysis on covid19_scrnaseq dataset. Creates a Seurat object from the empty-drop-filtered cellranger output. Plots UMAPs and heatmaps of DEGs. |
 | 16 | Lecture 14 | R/covid19\_scrnaseq\_assign\_clusters.R | scRNAseq analysis on covid19_scrnaseq dataset after filtering. Autoassigns cluster identities based on publicly available datasets. |
 | 17 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. Integrates the two datasets, then goes through the standard clustering workflow on the integrated dataset. Afterward, there are some examples of cluster assignment. |
+| 18 | Lab 13 | R/covid19\_scrnaseq\_challenge.R | Starter script for the covid19\_scrnaseq\_challenge dataset. |
 
 In addition, there are two files (`scrnaseq_qc_plots.R` and `utils.R`) to store reusable functions. For some of the scripts, if I couldn't get the code to run, I simply hashed it out. For example, I couldn't install `scater`, and I have yet to get to fixing the bugs in `scrnaseq_qc_plots::print_HTML`).

@@ -40,7 +40,7 @@ filter_list_for_match <- function(items, pattern) {
 # See: https://stackoverflow.com/questions/5577221/can-i-load-a-saved-r-object-into-a-new-object-name
 load_rdata <- function(filepath){
     load(filepath)
-    return( get(basename(filepath)) )
+    return( get(ls()[ls() != "filepath"]) )
 }
 
 
