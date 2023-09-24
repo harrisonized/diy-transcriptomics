@@ -33,7 +33,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -47,7 +47,7 @@ log_print(paste('Script started at:', start_time))
 log_print(paste(Sys.time(), 'Getting reference dataset...'))
 
 # query the biomaRt database
-mart <- useMart(biomart="ENSEMBL_MART_ENSEMBL", dataset = opt['biomart-dataset'][[1]])
+mart <- useMart(biomart="ENSEMBL_MART_ENSEMBL", dataset = opt[['biomart-dataset']])
 ref_tx <- getBM(
     attributes=c('ensembl_transcript_id_version', 'external_gene_name'),
     mart = mart
@@ -61,8 +61,8 @@ ref_tx <- dplyr::rename(ref_tx,
 if (!troubleshooting){
     write.table(
         ref_tx,
-        file = file.path(wd, opt['output-dir'][[1]],  # dirpath
-                         paste0(opt['biomart-dataset'][[1]], '.csv')),  # filename
+        file = file.path(wd, opt[['output-dir']],  # dirpath
+                         paste0(opt[['biomart-dataset']], '.csv')),  # filename
         row.names = FALSE,
         sep = ','
     )
@@ -78,7 +78,7 @@ if (!troubleshooting){
 log_print(paste(Sys.time(), 'Querying promoter sequences...'))
 
 sequences = getSequence(
-    id = unlist(opt['genes'][[1]]),
+    id = unlist(opt[['genes']]),
     type = "external_gene_name",  # or "hgnc_symbol" and "uniprot_gn_symbol" are missing MX1
     seqType = "coding_gene_flank",
     upstream = 1000,
@@ -90,7 +90,7 @@ sequences <- as_tibble(rev(sequences))
 if (!troubleshooting){
     write.table(
         sequences,
-        file = file.path(wd, opt['output-dir'][[1]],  # dirpath
+        file = file.path(wd, opt[['output-dir']],  # dirpath
                          paste0('promoter_sequences', '.csv')),  # filename
         row.names = FALSE,
         sep = ','

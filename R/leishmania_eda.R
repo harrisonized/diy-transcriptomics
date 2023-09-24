@@ -32,7 +32,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -47,8 +47,8 @@ log_print(paste('Script started at:', start_time))
 
 # define data source
 files = filter_list_for_match(
-    list_files(file.path(wd, opt['input-dir'][[1]])),
-    opt['filename'][[1]]  # file_ext
+    list_files(file.path(wd, opt[['input-dir']])),
+    opt[['filename']]  # file_ext
 )
 # Example file: "data/schistosoma/mapped_reads/F12h_LE_1/abundance.tsv"
 #   target_id    length eff_length est_counts   tpm

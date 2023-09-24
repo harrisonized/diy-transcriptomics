@@ -31,7 +31,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -121,7 +121,7 @@ fig <- ggplot(
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'figure_1-imported_live_mammals.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'figure_1-imported_live_mammals.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -147,7 +147,7 @@ fig <- ggplot(agg_tbl[1:10, ], aes(x = reorder(country_origin, -total_quantity),
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'figure_2-countries_most_macaques.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'figure_2-countries_most_macaques.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -174,7 +174,7 @@ fig <- ggplot(agg_tbl[1:10, ], aes(x = reorder(country_origin, -total_quantity),
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'figure_3-countries_most_bats.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'figure_3-countries_most_bats.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -196,7 +196,7 @@ fig <- ggplot(agg_tbl[1:10, ], aes(x = reorder(purpose, -total_quantity), y = to
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'figure_4-countries_most_bats_purpose.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'figure_4-countries_most_bats_purpose.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -219,7 +219,7 @@ fig <- ggplot(agg_tbl, aes(fill=specific_name, y=total_quantity, x=reorder(count
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'figure_5-imported_bats.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'figure_5-imported_bats.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -270,7 +270,7 @@ fig <- ggplot(agg_tbl, aes(fill=specific_name, y=total_quantity, x=reorder(port,
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'figure_6-imported_fruit_bats.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'figure_6-imported_fruit_bats.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -296,7 +296,7 @@ fig <- ggplot(agg_tbl, aes(fill=specific_name, y=total_quantity, x=reorder(port,
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'figure_7-wildebeest-skin.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'figure_7-wildebeest-skin.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 

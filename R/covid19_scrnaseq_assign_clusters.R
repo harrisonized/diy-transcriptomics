@@ -46,7 +46,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -60,12 +60,12 @@ log_print(paste('Script started at:', start_time))
 
 log_print(paste(Sys.time(), 'Reading data...'))
 
-sce_counts <- read10xCounts(file.path(wd, opt['input-dir'][[1]]))
+sce_counts <- read10xCounts(file.path(wd, opt[['input-dir']]))
 # Note: to convert Seurat object to SingleCellExperiment object directly:
 # sce_counts <- as.SingleCellExperiment(pbmc.1k.seurat)
 rownames(sce_counts) <- rowData(sce_counts)[['Symbol']]   # row names be gene_name instead of gene_id
 
-marker_list <- fromJSON(file=file.path(wd, opt['marker-list'][[1]]))
+marker_list <- fromJSON(file=file.path(wd, opt[['marker-list']]))
 marker_matrix <- marker_list_to_mat(marker_list, include_other = FALSE)  # convert to matrix
 
 # view matrix as a heatmap
@@ -137,9 +137,9 @@ switch=list(
     #211 bulk human microarray samples of sorted hematopoietic cell populations that can be found in GSE24759
     'Hemato'=NovershternHematopoieticData
 )
-get_data=switch[opt['celldex'][[1]]][[1]]
+get_data=switch[[opt$celldex]]
 
-ref_data <- get_data(ensembl = opt['ensembl'][[1]])  # ensembl=FALSE by default
+ref_data <- get_data(ensembl = opt[['ensembl']])  # ensembl=FALSE by default
 predictions <- SingleR(
     test=sce_counts,
     assay.type.test=1,
@@ -173,5 +173,5 @@ log_close()
 # )
 
 # if (!troubleshooting){
-#     write(toJSON(marker_list), opt['marker-list'][[1]])
+#     write(toJSON(marker_list), opt[['marker-list']])
 # }

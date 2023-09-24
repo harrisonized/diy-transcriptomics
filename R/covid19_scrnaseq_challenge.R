@@ -42,7 +42,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -53,8 +53,8 @@ log_print(paste('Script started at:', start_time))
 # ----------------------------------------------------------------------
 # Read Data
 
-seurat_obj <- load_rdata(file.path(wd, opt['input-file'][[1]]))
-study_design <- read_tsv(file.path(wd, opt['metadata'][[1]]))
+seurat_obj <- load_rdata(file.path(wd, opt[['input-file']]))
+study_design <- read_tsv(file.path(wd, opt[['metadata']]))
 
 
 # ----------------------------------------------------------------------

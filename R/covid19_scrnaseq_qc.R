@@ -44,15 +44,15 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # create required directories
 if (!troubleshooting) {
-    if (!dir.exists(file.path(wd, opt['output-dir'][[1]]))) {
-        dir.create(file.path(wd, opt['output-dir'][[1]]))
+    if (!dir.exists(file.path(wd, opt[['output-dir']]))) {
+        dir.create(file.path(wd, opt[['output-dir']]))
     }
-    if (!dir.exists(file.path(wd, opt['input-dir'][[1]], 'qc_report'))) {
-        dir.create(file.path(wd, opt['input-dir'][[1]], 'qc_report'))
+    if (!dir.exists(file.path(wd, opt[['input-dir']], 'qc_report'))) {
+        dir.create(file.path(wd, opt[['input-dir']], 'qc_report'))
     }
 }
 
@@ -69,13 +69,13 @@ log_print(paste('Script started at:', start_time))
 log_print(paste(Sys.time(), 'Reading data...'))
 
 raw_mtx <- read_10x(
-    file.path(wd, opt['input-dir'][[1]], 'counts_unfiltered', 'cellranger')
+    file.path(wd, opt[['input-dir']], 'counts_unfiltered', 'cellranger')
 )
 
 # load run info from JSON files produced by Kb
 kb_stats <- c(
-    fromJSON(file = file.path(wd, opt['input-dir'][[1]], 'inspect.json')),
-    fromJSON(file = file.path(wd, opt['input-dir'][[1]], 'run_info.json'))
+    fromJSON(file = file.path(wd, opt[['input-dir']], 'inspect.json')),
+    fromJSON(file = file.path(wd, opt[['input-dir']], 'run_info.json'))
 )
 
 
@@ -90,7 +90,7 @@ drop_stats <- DropletUtils::emptyDrops(raw_mtx)
 
 # set threshold probability for calling a cell
 filt_mtx <- raw_mtx[,(
-    (drop_stats[['FDR']] <= opt['fdr-threshold'][[1]]) &
+    (drop_stats[['FDR']] <= opt[['fdr-threshold']]) &
     (is.na(drop_stats[['FDR']])==FALSE)
 )]
 filt_barcodes = data.frame('V1'=colnames(filt_mtx))  # columns
@@ -99,7 +99,7 @@ filt_genes = data.frame('X2'=rownames(filt_mtx))  # columns
 # write drop_stats filtered results
 if (!troubleshooting) {
     write10xCounts(
-        file.path(wd, opt['input-dir'][[1]], 'counts_filtered', 'cellranger'),
+        file.path(wd, opt[['input-dir']], 'counts_filtered', 'cellranger'),
         filt_mtx,
         gene.symbol = filt_genes[['X2']],
         overwrite=TRUE
@@ -123,7 +123,7 @@ if (!troubleshooting) {
 log_print(paste(Sys.time(), 'Generating QC report...'))
 
 # determine chemistry version
-tech <- grep('10X(.*)', strsplit(kb_stats[['call']], '\\s')[[1]], value=TRUE) 
+tech <- grep('10X(.*)', unlist(strsplit(kb_stats[['call']], '\\s')), value=TRUE) 
 
 # make a nice/simple table that summarizes that stats
 seq_stats <- data.frame(
@@ -139,7 +139,7 @@ seq_stats <- data.frame(
 if (!troubleshooting) {
     write.table(
         seq_stats,
-        file.path(wd, opt['input-dir'][[1]], 'qc_report', 'seq_stats.csv'),
+        file.path(wd, opt[['input-dir']], 'qc_report', 'seq_stats.csv'),
         row.names = FALSE,
         sep = ','
     )
@@ -163,7 +163,7 @@ cell_stats <- data.frame(
 if (!troubleshooting) {
     write.table(
         cell_stats,
-        file.path(wd, opt['input-dir'][[1]], 'qc_report', 'cell_stats.csv'),
+        file.path(wd, opt[['input-dir']], 'qc_report', 'cell_stats.csv'),
         row.names = FALSE,
         sep = ','
     )
@@ -174,7 +174,7 @@ if (!troubleshooting) {
     bc_rank_plot(
         stats = barcodeRanks(raw_mtx),
         raw_cells = raw_barcodes, filt_cells = filt_barcodes,
-        save = file.path(wd, opt['output-dir'][[1]], 'barcode_rank.png')
+        save = file.path(wd, opt[['output-dir']], 'barcode_rank.png')
     )
 }
 

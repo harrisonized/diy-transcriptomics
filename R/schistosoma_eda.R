@@ -44,7 +44,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -60,8 +60,8 @@ log_print(paste(Sys.time(), 'Reading files...'))
 # define data source
 # schistosoma dataset has 144 files
 files = filter_list_for_match(
-    list_files(file.path(wd, opt['input-dir'][[1]])),
-    opt['filename'][[1]]  # file_ext
+    list_files(file.path(wd, opt[['input-dir']])),
+    opt[['filename']]  # file_ext
 )
 
 # get human annotations
@@ -89,7 +89,7 @@ suffix_for_col = c(
 )
 sample_ids = unlist(lapply(files, function(x) basename(dirname(x))))
 for (col in names(suffix_for_col)){
-    suffix = suffix_for_col[col][[1]]
+    suffix = suffix_for_col[[col]]
     colnames(txi[[col]]) <- unlist(lapply(sample_ids, function(x) paste(x, suffix, sep='')))
 }
 
@@ -98,19 +98,19 @@ if (!troubleshooting) {
 
     log_print(paste(Sys.time(), 'Saving txi files...'))
     
-    if (!dir.exists(file.path(wd, dirname(opt['input-dir'][[1]]), 'txi'))) {
-        dir.create(file.path(wd, dirname(opt['input-dir'][[1]]), 'txi'), recursive=TRUE)
+    if (!dir.exists(file.path(wd, dirname(opt[['input-dir']]), 'txi'))) {
+        dir.create(file.path(wd, dirname(opt[['input-dir']]), 'txi'), recursive=TRUE)
     }
     write.table(txi[['counts']],
-                file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_counts.csv'),
+                file.path(wd, dirname(opt[['input-dir']]), 'txi', 'txi_counts.csv'),
                 quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
     write.table(txi[['abundance']],
-                file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_abundances.csv'),
+                file.path(wd, dirname(opt[['input-dir']]), 'txi', 'txi_abundances.csv'),
                 quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
 
     # don't need this
     # write.table(txi$length,
-    #             file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_lengths.csv'),
+    #             file.path(wd, dirname(opt[['input-dir']]), 'txi', 'txi_lengths.csv'),
     #             quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
 }
 
@@ -143,7 +143,7 @@ fig <- ggplot(txi[['abundance']]) +
     theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_unfiltered_unnormalized.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'eda', 'tpm_unfiltered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -155,8 +155,8 @@ if (!troubleshooting) {
 dge_list <- edgeR::DGEList(txi[['counts']])
 if (FALSE) {
     # note: this doesn't work for some reason
-    save(dge_list, file=file.path(wd, dirname(opt['input-dir'][[1]]), "dge_list.txt"))
-    load(file=file.path(wd, dirname(opt['input-dir'][[1]]), "dge_list.txt"))  # example load
+    save(dge_list, file=file.path(wd, dirname(opt[['input-dir']]), "dge_list.txt"))
+    load(file=file.path(wd, dirname(opt[['input-dir']]), "dge_list.txt"))  # example load
 }
 
 
@@ -192,7 +192,7 @@ p1 <- ggplot(cpm_long) +
   theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cpm_unfiltered_unnormalized.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'eda', 'cpm_unfiltered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -231,7 +231,7 @@ p2 <- ggplot(cpm_long) +
     # coord_flip()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_filtered_unnormalized.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'eda', 'tpm_filtered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -250,7 +250,7 @@ if (!troubleshooting) {
     log_print(paste(Sys.time(), 'Saving filtered_normalized_cpm.csv ...'))
     write.table(
         cpm_norm_wide,
-        file.path(wd, dirname(opt['input-dir'][[1]]), 'filtered_normalized_cpm.csv'),
+        file.path(wd, dirname(opt[['input-dir']]), 'filtered_normalized_cpm.csv'),
         quote=FALSE, col.names=TRUE, row.names=FALSE, sep=','
     )
 }
@@ -279,7 +279,7 @@ p3 <- ggplot(cpm_norm_long) +
   theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'tpm_filtered_normalized.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'eda', 'tpm_filtered_normalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -292,7 +292,7 @@ log_print(paste(Sys.time(), 'Plotting cowplot...'))
 cowplot::plot_grid(p1, p2, p3, labels = c('A', 'B', 'C'), label_size = 12)
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cowplot.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'eda', 'cowplot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 

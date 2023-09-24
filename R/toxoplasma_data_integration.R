@@ -66,7 +66,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -80,8 +80,8 @@ log_print(paste('Script started at:', start_time))
 
 log_print(paste(Sys.time(), 'Reading data...'))
 
-seurat_1 <- load_rdata(file.path(wd, opt['input-1'][[1]]))  # spleen.naive.seurat
-seurat_1$treatment <- opt['label-1'][[1]]  # naive
+seurat_1 <- load_rdata(file.path(wd, opt[['input-1']]))  # spleen.naive.seurat
+seurat_1$treatment <- opt[['label-1']]  # naive
 # Note: I normally don't like to use the '$' operator, but in this case, 
 # seurat_1$treatment adds the label to seurat_1@meta.data[['treatment']], and
 # seurat_1[['treatment']] does not
@@ -92,17 +92,17 @@ seurat_1$treatment <- opt['label-1'][[1]]  # naive
 # Plot UMAP of raw data
 DimPlot(seurat_1, reduction = "umap", split.by = "orig.ident", label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-unlabeled_1.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'umap-unlabeled_1.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
-seurat_2 <- load_rdata(file.path(wd, opt['input-2'][[1]]))  # spleen.toxoInfected.seurat
-seurat_2$treatment <- opt['label-2'][[1]]  # infected
+seurat_2 <- load_rdata(file.path(wd, opt[['input-2']]))  # spleen.toxoInfected.seurat
+seurat_2$treatment <- opt[['label-2']]  # infected
 
 # Plot UMAP of raw data
 DimPlot(seurat_2, reduction = "umap", split.by = "orig.ident", label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-unlabeled_2.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'umap-unlabeled_2.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -212,7 +212,7 @@ integrated_seurat <- FindClusters(integrated_seurat, resolution = 0.5)
 # Plot UMAP with clusters highlighted
 DimPlot(integrated_seurat, reduction = "umap", label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-integrated.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'umap-integrated.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -222,7 +222,7 @@ DimPlot(integrated_seurat, reduction = "umap",
         group.by = "seurat_clusters", # labels the cells with values from your group.by variable
         label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-integrated-split.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'umap-integrated-split.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -237,7 +237,7 @@ FeaturePlot(integrated_seurat,
             min.cutoff = 'q10',
             label = FALSE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], paste0('umap-', tolower(gene), '.png')),
+    ggsave(file.path(wd, opt[['output-dir']], paste0('umap-', tolower(gene), '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -252,7 +252,7 @@ FeaturePlot(integrated_seurat,
             min.cutoff = 'q10',
             label = FALSE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]],
+    ggsave(file.path(wd, opt[['output-dir']],
                      paste0('umap-', paste(tolower(genes), collapse="_"), '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -284,7 +284,7 @@ DimPlot(
     label = TRUE
 )
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'labeled', 'umap-integrated-celldex_labeled.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'labeled', 'umap-integrated-celldex_labeled.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -305,7 +305,7 @@ DimPlot(integrated_seurat, reduction = "umap",
         split.by = "treatment", # this facets the plot 
         label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'labeled', 'umap-integrated-manually_labeled.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'labeled', 'umap-integrated-manually_labeled.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -327,12 +327,12 @@ DimPlot(integrated_seurat_subset, reduction = "umap", label = TRUE)
 if (!troubleshooting) {
 
     # format string
-    cluster_of_interest_f <- strsplit(cluster_of_interest, split=' ')[[1]] %>%
+    cluster_of_interest_f <- unlist(strsplit(cluster_of_interest, split=' ')) %>%
         paste(collapse="_") %>%
         gsub('[+]', '', .) %>%  # remove special characters
         tolower()
 
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'labeled',
+    ggsave(file.path(wd, opt[['output-dir']], 'labeled',
                      paste0('umap-', cluster_of_interest_f, '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -358,7 +358,7 @@ degs.df <- as_tibble(degs, rownames = "geneID")
 # if (!troubleshooting) {
 #     write_tsv(
 #         degs_top20,
-#         file.path(wd, opt['input-dir'][[1]], 'degs-top_20.tsv')
+#         file.path(wd, opt[['input-dir']], 'degs-top_20.tsv')
 #     )
 # }
 
@@ -373,7 +373,7 @@ FeaturePlot(integrated_seurat_subset,
             min.cutoff = 'q10',
             label = FALSE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'labeled',
+    ggsave(file.path(wd, opt[['output-dir']], 'labeled',
                      paste0('umap-', tolower(gene), '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
@@ -389,6 +389,6 @@ log_close()
 # Code graveyard
 
 # # example of annotating seurat objects using metadata
-# study_design <- read_tsv(file.path(wd, opt['metadata'][[1]]))
+# study_design <- read_tsv(file.path(wd, opt[['metadata']]))
 # seurat_1$treatment <- study_design[['treatment']][1]  # naive
 # seurat_2$treatment <- study_design[['treatment']][2]  # infected

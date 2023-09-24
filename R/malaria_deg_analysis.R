@@ -40,7 +40,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -54,11 +54,11 @@ log_print(paste('Script started at:', start_time))
 log_print(paste(Sys.time(), 'Reading data...'))
 
 # From eda.R
-txi_counts <- read_csv(file.path(wd, opt['input-file'][[1]]))
+txi_counts <- read_csv(file.path(wd, opt[['input-file']]))
 sample_ids <- colnames(txi_counts)
 
 # metadata
-study_design <- read_tsv(file.path(wd, opt['metadata'][[1]]))
+study_design <- read_tsv(file.path(wd, opt[['metadata']]))
 group <- factor(
     unlist(lapply(study_design['group'], function(x) paste0('timepoint_', x)))
 )
@@ -83,7 +83,7 @@ log_print(paste(Sys.time(), "Fitting Bayesian model..."))
 design_matrix <- model.matrix(~0+group)
 colnames(design_matrix) <- levels(group)
 
-png(file.path(wd, opt['output-dir'][[1]], 'pca', 'voom.png'))
+png(file.path(wd, opt[['output-dir']], 'pca', 'voom.png'))
 log_cpm <- voom(dge_subset_norm, design_matrix, plot = TRUE)  # need an output
 dev.off()
 
@@ -113,7 +113,7 @@ gt_table_1 <- gt(top_hits)
 if (!troubleshooting) {
     gtsave(gt_table_1,
            'gt_example_1.png',
-           path=file.path(wd, opt['output-dir'][[1]])
+           path=file.path(wd, opt[['output-dir']])
     )
 }
 
@@ -145,7 +145,7 @@ vplot <- ggplot(top_hits) +
 ggplotly(vplot)
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'volcano_plot.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'volcano_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -165,7 +165,7 @@ results <- decideTests(
 vennDiagram(results[, 1:4], include="up")
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'venn_diagram.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'pca', 'venn_diagram.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -202,7 +202,7 @@ if (!troubleshooting) {
     # (e.g., String, Clust (https://github.com/BaselAbujamous/clust, etc.)
     write_tsv(
         diff_genes,
-        file.path(wd, dirname(dirname(opt['input-file'][[1]])), "diff_genes.tsv")
+        file.path(wd, dirname(dirname(opt[['input-file']])), "diff_genes.tsv")
     )
 }
 
@@ -227,7 +227,7 @@ module.color <- module.color[as.vector(module.assign)]
 
 if (!troubleshooting) {
     # see: http://www.sthda.com/english/wiki/creating-and-saving-graphs-r-base-graphs
-    png(file.path(wd, opt['output-dir'][[1]], 'heatmap.png'))
+    png(file.path(wd, opt[['output-dir']], 'heatmap.png'))
     heatmap.2(
         as.matrix(diff_genes[, 2:ncol(diff_genes)]), 
         Rowv=as.dendrogram(clustRows), 

@@ -37,7 +37,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -51,11 +51,11 @@ log_print(paste('Script started at:', start_time))
 log_print(paste(Sys.time(), 'Reading data...'))
 
 # From eda.R
-cpm_data <- read_csv(file.path(wd, opt['input-file'][[1]]))
+cpm_data <- read_csv(file.path(wd, opt[['input-file']]))
 sample_ids <- colnames(cpm_data[, 2:ncol(cpm_data)])
 
 # metadata
-study_design <- read_tsv(file.path(wd, opt['metadata'][[1]]))
+study_design <- read_tsv(file.path(wd, opt[['metadata']]))
 group <- factor(
     unlist(lapply(study_design['group'], function(x) paste0('timepoint_', x)))
 )
@@ -92,7 +92,7 @@ pca_plot <- ggplot(pca_scores) +
 ggplotly(pca_plot)
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'pca_plot.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'pca', 'pca_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -125,7 +125,7 @@ fig <- ggplot(pca_scores_long) +
     coord_flip()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'pca_small_multiples_plot.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'pca', 'pca_small_multiples_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 

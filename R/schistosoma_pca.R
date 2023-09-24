@@ -36,7 +36,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -50,7 +50,7 @@ log_print(paste('Script started at:', start_time))
 log_print(paste(Sys.time(), 'Reading data...'))
 
 # From eda.R
-cpm_data <- read_csv(file.path(wd, opt['input-file'][[1]]))
+cpm_data <- read_csv(file.path(wd, opt[['input-file']]))
 sample_ids <- colnames(cpm_data[, 2:ncol(cpm_data)])
 
 study_design <- read_tsv(file.path(wd, 'data', 'schistosoma', "studyDesign.txt"))
@@ -73,7 +73,7 @@ clusters <- hclust(distances, method = "average")
 # plot dendrogram
 if (!troubleshooting) {
     # see: http://www.sthda.com/english/wiki/creating-and-saving-graphs-r-base-graphs
-    png(file.path(wd, opt['output-dir'][[1]], 'pca', 'dendrogram.png'))
+    png(file.path(wd, opt[['output-dir']], 'pca', 'dendrogram.png'))
     plot(clusters, labels=sample_ids)
     dev.off()
 }
@@ -101,7 +101,7 @@ pca_result <- prcomp(
 
 # Plot eigenvalues for each PC
 if (!troubleshooting) {
-    png(file.path(wd, opt['output-dir'][[1]], 'pca', 'screeplot.png'))
+    png(file.path(wd, opt[['output-dir']], 'pca', 'screeplot.png'))
     screeplot(pca_result)
     dev.off()
 }
@@ -125,7 +125,7 @@ pca_plot <- ggplot(pca_scores) +
     theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'pca_plot.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'pca', 'pca_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -160,7 +160,7 @@ fig <- ggplot(pca_scores_long) +
     coord_flip()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'pca_small_multiples_plot.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'pca', 'pca_small_multiples_plot.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -196,7 +196,7 @@ cpm_subset <- cpm_agg %>%
 gt_table_1 <- gt(cpm_subset)
 gtsave(gt_table_1,
        'gt_example_1.png',
-       path=file.path(wd, opt['output-dir'][[1]])
+       path=file.path(wd, opt[['output-dir']])
 )
 
 gt_table_2 <- cpm_subset %>%
@@ -224,7 +224,7 @@ gt_table_2 <- cpm_subset %>%
 if (!troubleshooting) {
     gtsave(gt_table_2,
            'gt_example_2.png',
-           path=file.path(wd, opt['output-dir'][[1]])
+           path=file.path(wd, opt[['output-dir']])
     )
 }
 
@@ -262,7 +262,7 @@ fig <- ggplot(cpm_agg) +
 ggplotly(fig)
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'pca', 'plotly_scatter_example.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'pca', 'plotly_scatter_example.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 

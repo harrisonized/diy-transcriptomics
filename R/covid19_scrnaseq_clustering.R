@@ -47,11 +47,11 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 if (!troubleshooting) {
-    if (!dir.exists(file.path(wd, opt['output-dir'][[1]]))) {
-        dir.create(file.path(wd, opt['output-dir'][[1]]))
+    if (!dir.exists(file.path(wd, opt[['output-dir']]))) {
+        dir.create(file.path(wd, opt[['output-dir']]))
     }
 }
 
@@ -68,7 +68,7 @@ log_print(paste('Script started at:', start_time))
 log_print(paste(Sys.time(), 'Reading data...'))
 
 filt_mtx <- Read10X(
-    file.path(wd, opt['input-dir'][[1]], 'counts_filtered', 'cellranger'),
+    file.path(wd, opt[['input-dir']], 'counts_filtered', 'cellranger'),
     gene.column = 2,
     cell.column = 1,
     unique.features = TRUE,
@@ -88,7 +88,7 @@ seurat_obj[["pct_mt_reads"]] <- PercentageFeatureSet(
 # QC plot
 VlnPlot(seurat_obj, c("nCount_RNA", "nFeature_RNA", "pct_mt_reads"), pt.size = 0.1)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'violin-raw_qc.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'violin-raw_qc.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -119,7 +119,7 @@ ggplot(seurat_obj@meta.data, aes(nCount_RNA, nFeature_RNA)) +
 #    celltype (i.e red blood cells).
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'scatter-num_genes_vs_counts.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'scatter-num_genes_vs_counts.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -143,12 +143,12 @@ seurat_obj <- FindClusters(seurat_obj, resolution = 0.5)
 # Plot UMAP with clusters highlighted
 DimPlot(seurat_obj, reduction = "umap", split.by = "orig.ident", label = TRUE)
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'umap-clusters.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'umap-clusters.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
 # Plot UMAP for specific gene of interest
-gene = opt['gene-of-interest'][[1]]  # gene = 'IGHM'
+gene = opt[['gene-of-interest']]  # gene = 'IGHM'
 FeaturePlot(
     seurat_obj, reduction = "umap", features = c(gene),
     pt.size = 0.4,  min.cutoff = 'q10',
@@ -156,7 +156,7 @@ FeaturePlot(
     order = TRUE, label = FALSE
 )
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], paste0('umap-', gene, '.png')),
+    ggsave(file.path(wd, opt[['output-dir']], paste0('umap-', gene, '.png')),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -164,7 +164,7 @@ if (!troubleshooting) {
 # ----------------------------------------------------------------------
 # Find cluster-specific DEGs
 
-cluster_id = opt['cluster-id'][[1]]  # cluster_id = 1
+cluster_id = opt[['cluster-id']]  # cluster_id = 1
 
 # generally speaking there are three main ways you can find cluster-specific marker genes with Seurat
 # 1. 'FindMarkers' to compare a select cluster to all other cells not in that cluster
@@ -181,15 +181,15 @@ cluster_degs_top20 <- cluster_degs %>% arrange(desc(avg_log2FC)) %>% slice(1:20)
 if (!troubleshooting) {
     write_tsv(
         cluster_degs_top20,
-        file.path(wd, opt['input-dir'][[1]],
-                  paste0('degs-top_20-cluster_', opt['cluster-id'][[1]], '.tsv'))
+        file.path(wd, opt[['input-dir']],
+                  paste0('degs-top_20-cluster_', opt[['cluster-id']], '.tsv'))
     )
 }
 
 # # interactive table
 # datatable(degs_top20,
 #           extensions = c('KeyTable', "FixedHeader"), 
-#           caption = paste('Table 1: Cluster', opt['cluster-id'][[1]] , 'genes'),
+#           caption = paste('Table 1: Cluster', opt[['cluster-id']] , 'genes'),
 #           options = list(keys = TRUE, searchHighlight = TRUE, pageLength = 10,
 #                          lengthMenu = c("10", "25", "50", "100"))
 #     ) %>% formatRound(columns=c(2:11), digits=2)
@@ -204,7 +204,7 @@ all_degs <- FindAllMarkers(seurat_obj,only.pos = TRUE, min.pct = 0.25, logfc.thr
 all_degs_top10 <- all_degs %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
 DoHeatmap(seurat_obj, features = all_degs_top10[['gene']])
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'heatmap.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'heatmap.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 

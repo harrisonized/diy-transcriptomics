@@ -50,7 +50,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -65,11 +65,11 @@ log_print(paste('Script started at:', start_time))
 log_print(paste(Sys.time(), 'Reading data...'))
 
 # From eda.R
-txi_counts <- read_csv(file.path(wd, opt['input-file'][[1]]))
+txi_counts <- read_csv(file.path(wd, opt[['input-file']]))
 sample_ids <- colnames(txi_counts)
 
 # metadata
-study_design <- read_tsv(file.path(wd, opt['metadata'][[1]]))
+study_design <- read_tsv(file.path(wd, opt[['metadata']]))
 group <- factor(
     unlist(lapply(study_design['group'], function(x) paste0('timepoint_', x)))
 )
@@ -94,7 +94,7 @@ log_print(paste(Sys.time(), "Fitting Bayesian model..."))
 design_matrix <- model.matrix(~0+group)
 colnames(design_matrix) <- levels(group)
 
-png(file.path(wd, opt['output-dir'][[1]], 'pca', 'voom.png'))
+png(file.path(wd, opt[['output-dir']], 'pca', 'voom.png'))
 log_cpm <- voom(dge_subset_norm, design_matrix, plot = TRUE)  # need an output
 dev.off()
 

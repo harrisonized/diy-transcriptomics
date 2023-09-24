@@ -32,7 +32,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -43,10 +43,10 @@ log_print(paste('Script started at:', start_time))
 # ----------------------------------------------------------------------
 # Read Data
 
-human_data <- read_tsv(file.path(wd, opt['human-data'][[1]]))
+human_data <- read_tsv(file.path(wd, opt[['human-data']]))
 human_data <- as.matrix(column_to_rownames(human_data, "...1"))
 
-animal_data <- read_tsv(file.path(wd, opt['ferret-data'][[1]]))
+animal_data <- read_tsv(file.path(wd, opt[['ferret-data']]))
 animal_data <- as.matrix(column_to_rownames(animal_data, "...1"))
 
 

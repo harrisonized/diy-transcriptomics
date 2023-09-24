@@ -43,7 +43,7 @@ option_list = list(
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-troubleshooting = opt['troubleshooting'][[1]]
+troubleshooting = opt[['troubleshooting']]
 
 # Start Log
 start_time = Sys.time()
@@ -59,8 +59,8 @@ log_print(paste(Sys.time(), 'Reading files...'))
 # define data source
 # malaria dataset has 14 files
 files = filter_list_for_match(
-    list_files(file.path(wd, opt['input-dir'][[1]])),
-    opt['filename'][[1]]  # file_ext
+    list_files(file.path(wd, opt[['input-dir']])),
+    opt[['filename']]  # file_ext
 )
 
 # Read abundance files into a txi object
@@ -81,7 +81,7 @@ suffix_for_col = c(
 )
 sample_ids = unlist(lapply(files, function(x) basename(dirname(x))))
 for (col in names(suffix_for_col)){
-    suffix = suffix_for_col[col][[1]]
+    suffix = suffix_for_col[[col]]
     colnames(txi_gene[[col]]) <- unlist(lapply(sample_ids, function(x) paste(x, suffix, sep='')))
 }
 
@@ -94,19 +94,19 @@ if (!troubleshooting) {
         dir.create(file.path(wd, 'data', 'malaria', 'txi'), recursive=TRUE)
     }
     write.table(txi_gene$counts,
-                file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_counts.csv'),
+                file.path(wd, dirname(opt[['input-dir']]), 'txi', 'txi_counts.csv'),
                 quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
     write.table(txi_gene$abundance,
-                file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_abundances.csv'),
+                file.path(wd, dirname(opt[['input-dir']]), 'txi', 'txi_abundances.csv'),
                 quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
     
     # write.table(txi_gene$length,
-    #             file.path(wd, dirname(opt['input-dir'][[1]]), 'txi', 'txi_lengths.csv'),
+    #             file.path(wd, dirname(opt[['input-dir']]), 'txi', 'txi_lengths.csv'),
     #             quote=FALSE, col.names=TRUE, row.names=FALSE, sep=',')
 }
 
 # metadata
-study_design <- read_tsv(file.path(wd, opt['metadata'][[1]]))
+study_design <- read_tsv(file.path(wd, opt[['metadata']]))
 sample_ids <- study_design[['sample']]
 
 
@@ -148,7 +148,7 @@ p1 <- ggplot(cpm_long) +
   theme_bw()
 
 if (!troubleshooting) {
-    ggsave(file.path(wd, opt['output-dir'][[1]], 'eda', 'cpm_unfiltered_unnormalized.png'),
+    ggsave(file.path(wd, opt[['output-dir']], 'eda', 'cpm_unfiltered_unnormalized.png'),
            height=750, width=1200, dpi=300, units="px", scaling=0.5)
 }
 
@@ -206,7 +206,7 @@ if (!troubleshooting) {
     log_print(paste(Sys.time(), 'Saving filtered, normalized cpm...'))
     write.table(
         cpm_norm_wide,
-        file.path(wd, dirname(opt['input-dir'][[1]]), 'filtered_normalized_cpm.csv'),
+        file.path(wd, dirname(opt[['input-dir']]), 'filtered_normalized_cpm.csv'),
         quote=FALSE, col.names=TRUE, row.names=FALSE, sep=','
     )
 }
