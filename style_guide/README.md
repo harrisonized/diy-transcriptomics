@@ -1,3 +1,5 @@
+## Writing Clean Code
+
 When you learn how to write clean code, just like writing an essay, you need to find a style that works for you. There is no single "right way." The most important thing is to be consistent. Here are a few tips to help you get started:
 
 1. Variable naming conventions. Find names for your variables that are as specific as possible without making them too specific. This is easier said than done. I see a lot of `my_data` a lot, and that is overly general. But something like `ferret_tx` may be too specific, because if you'd ever want to swap that out for mouse, the variable name will no longer be accurate. A reasonable name is `animal_tx`, because it's more specific than ferret, but less specific than `ref_tx`. It all depends on context. Note that although `tx` by itself would work, because it is so short, it becomes hard to search, and I would avoid using short variable names. There are two exceptions to this rule. One is if that variable is the ONLY one of its kind in the script and is referenced very often. For example, if a script is only ever going to handle one dataframe, then `df` is an acceptable name. The other example is if the variable is something that is one-and-done. In that case, it's acceptable to name it something nondescriptive, such as `tmp`, `cols`, `files`, etc. to signal that these variables are not important. As for snake\_case vs. CamelCase, either is acceptable, so pick one and stick with it. The only thing that is unacceptable is to switch back and forth between the two. Sometimes it's unavoiable, because say you've written your code in snake\_case, but the library you're importing from uses CamelCase. This scenario is acceptable as long as you stick to your convention, do not switch just because the library you're importing has a different convention.
@@ -6,7 +8,7 @@ When you learn how to write clean code, just like writing an essay, you need to 
 4. Abstracting away complexity. If you find that you need many lines of code to achieve a singular goal, you should wrap it in a function. For example, suppose you have 20 csv files that you are processing. When you import these csv files, you need to rename the column names, properly format a datetime column, and force another column to be an integer datatype instead of float, and you need to do this multiple times. Rather than leaving each item like that, wrap it in a `preprocess_data` function, and now  when the reader reads that section, they can instantly understand your intent without ever having to write code comments. Building on this, it is possible to write an R script that calls another R script with slightly differernt parameters, which prevents code duplication.
 5. Hardcoding vs. parameters. When possible, always try to write your code in a way that hard-coded paths can be easily substituted. This means putting it in a command line argument that is easily accessible.
 
-Antipatterns to avoid:
+## Antipatterns to Avoid
 
 1. code duplication
 2. hard-coding: paths, data, column names, etc.
@@ -19,3 +21,11 @@ Antipatterns to avoid:
 9. improper variable names: name your variables something descriptive and searchable
 
 It is important to you try your best to avoid emulating these antipatterns. If you find yourself pressed for time and have to use an antipattern, always go back and clean it up after the deadline. This allows you to prevent accumulating technical debt, which if left unaddressed, will eventually cause you to never use your code again.
+
+## Example Repositories
+
+A good way to learn how to construct your own repository is to look at examples from professionally maintained github repositories. Here are some that I particularly like:
+
+1. [seurat](https://github.com/satijalab/seurat): A small-ish library that's well documented. In here, you will find examples of good code comments and proper scoping, as in each script, they take proper care to only import the libraries they need. They also demonstrate how to call C++ functions from R scripts to speed up certain tasks.
+2. [textshape](https://github.com/trinker/textshape): This is a small-ish library that has a singular focus. Each R script contains only a few functions, making them easy to understand. The examples included in their README.md file are the best.
+3. [plotly.R](https://github.com/plotly/plotly.R): This is a comparatively larger library, and it may be a little overwhelming at first, but I think it's important to see how complex a library can become.
