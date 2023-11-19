@@ -275,8 +275,34 @@ These are all the scripts covered in the lecture and lab portions of the class. 
 | 17 | Lecture 14 | R/toxoplasma\_data\_integration.R | Compares two seurat objects from the toxoplasma dataset. Integrates the two datasets, then goes through the standard clustering workflow on the integrated dataset. Afterward, there are some examples of cluster assignment. |
 | 18 | Lab 13 | R/covid19\_scrnaseq\_challenge.R | Starter script for the covid19\_scrnaseq\_challenge dataset. |
 
-In addition, there are two files (`scrnaseq_qc_plots.R` and `utils.R`) to store reusable functions. For some of the scripts, if I couldn't get the code to run, I simply hashed it out. For example, I couldn't install `scater`, and I have yet to get to fixing the bugs in `scrnaseq_qc_plots::print_HTML`). Lastly, GSEA analysis was not emphasized during the class, and I have yet to try it out.
+In addition, there are two files (`scrnaseq_qc_plots.R` and `utils.R`) to store reusable functions. For some of the scripts, if I couldn't get the code to run, I simply hashed it out. For example, I couldn't install `scater`, and I have yet to get to fixing the bugs in `scrnaseq_qc_plots::print_HTML`). Lastly, since GSEA analysis was not emphasized during the class, this is one of the few scripts I have yet to work through.
+
+
+## Getting Started
+
+1. Fork this repository by either pressing the [Fork] button top right in the same line as the title (diy-transcriptomics), or by following [this link](https://github.com/harrisonized/diy-transcriptomics/fork).
+
+2. Git clone from your fork to your computer. For example, to git clone from my repo, run:
+
+	```bash
+	git clone git@github.com:harrisonized/diy-transcriptomics.git
+	```
+	To get the link for your fork, press the green [<> Code] button on the top right corner, to the right of [master]. I recommend cloning into a directory you use specifically for code. For example, on my computer, I have this repository saved in `~/github/`.
+
+3. To run a bash script, use the `bash` command and point it to the script. For example:
+
+	```bash
+	bash build_kallisto_index.sh
+	```
+	
+	Note that my bash scripting is not the best, and I hardcoded some of the paths. You may have to change some of the references within the scripts to make it work.
+
+4. To run a R script, use the `Rscript` command and point it to the script. For example:
+
+	```bash
+	Rscript R/leishmania_eda.R
+	```
 
 ## Getting Help
 
-If you try this code and you run into problems, please reach out to me through my Penn email: first (dot) last_name @ pennmedicine (dot) upenn (dot) edu, and I will be happy to answer your questions.
+If you try this code and you run into problems, please reach out to me through my Penn email: first\_name (dot) last\_name @ pennmedicine (dot) upenn (dot) edu, and I will be happy to answer your questions.

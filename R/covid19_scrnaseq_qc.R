@@ -102,7 +102,7 @@ if (!troubleshooting) {
         file.path(wd, opt[['input-dir']], 'counts_filtered', 'cellranger'),
         filt_mtx,
         gene.symbol = filt_genes[['X2']],
-        overwrite=TRUE
+        overwrite=TRUE  # warning: this will empty your directory!
     )
 }
 
