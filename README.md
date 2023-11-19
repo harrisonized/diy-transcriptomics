@@ -292,7 +292,7 @@ In addition, there are two files (`scrnaseq_qc_plots.R` and `utils.R`) to store 
 3. To run a bash script, use the `bash` command and point it to the script. For example:
 
 	```bash
-	bash build_kallisto_index.sh
+	bash bash/build_kallisto_index.sh
 	```
 	
 	Note that my bash scripting is not the best, and I hardcoded some of the paths. You may have to change some of the references within the scripts to make it work.
@@ -303,6 +303,9 @@ In addition, there are two files (`scrnaseq_qc_plots.R` and `utils.R`) to store 
 	Rscript R/leishmania_eda.R
 	```
 
+5. Please read and keep the [style guide](https://github.com/harrisonized/diy-transcriptomics/tree/master/style_guide) in mind when you make changes to your fork.
+
+
 ## Getting Help
 
-If you try this code and you run into problems, please reach out to me through my Penn email: first\_name (dot) last\_name @ pennmedicine (dot) upenn (dot) edu, and I will be happy to answer your questions.
+If you try this code and you run into problems, please [create a Github issue](https://github.com/harrisonized/diy-transcriptomics/issues), and I will try my best to address it when I have time. Alternatively, you can reach out to me through my Penn email: first\_name (dot) last\_name @ pennmedicine (dot) upenn (dot) edu.
